@@ -32,7 +32,7 @@ export default async function RootLayout({
 			className={`${lato.className}`}
 			suppressHydrationWarning={true}
 		>
-			<body>
+			<body className="bg-background font-sans antialiased overflow-hidden">
 				<NextTopLoader showSpinner={false} />
 				<Providers session={session}>
 					<ToasterSonner />

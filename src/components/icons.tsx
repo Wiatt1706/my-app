@@ -1,4 +1,4 @@
-type IconProps = React.HTMLAttributes<SVGElement>
+type IconProps = React.HTMLAttributes<SVGElement>;
 import {
   AlertTriangle,
   ArrowRight,
@@ -26,13 +26,13 @@ import {
   Settings,
   SunMedium,
   Trash,
-  Twitter,
   User,
   UserCircle2Icon,
   UserPen,
   UserX2Icon,
-  X
-} from 'lucide-react';
+  X,
+  MapPin,
+} from "lucide-react";
 
 export type Icon = LucideIcon;
 
@@ -65,6 +65,7 @@ export const Icons = {
   sun: SunMedium,
   moon: Moon,
   laptop: Laptop,
+  mapPin: MapPin,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"
