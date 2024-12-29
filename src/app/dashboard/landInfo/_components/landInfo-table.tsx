@@ -3,8 +3,6 @@
 import * as React from "react";
 import { landInfo, type LandInfo } from "@/db/schema";
 import type { DataTableFilterField, DataTableRowAction } from "@/types";
-
-import { toSentenceCase } from "@/lib/utils";
 import { useDataTable } from "@/hooks/use-data-table";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
@@ -45,7 +43,7 @@ export function LandInfosTable({ promises }: LandInfoTableProps) {
       id: "landType",
       label: "type",
       options: landInfo.landType.enumValues.map((type) => ({
-        label: toSentenceCase(type),
+        label: getTypeContent(type).text,
         value: type,
         icon: getTypeContent(type).icon,
         count: TypeCounts[type],

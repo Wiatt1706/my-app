@@ -179,6 +179,12 @@ export const landInfo = pgTable("land_info", {
   })
     .notNull()
     .default("0"),
+  landStatus: varchar("land_status", {
+    length: 30,
+    enum: ["0", "1", "2", "3", "4"],
+  })
+    .notNull()
+    .default("0"),
   capacitySize: integer("capacity_size"),
   usedPixelBlocks: integer("used_pixel_blocks").default(0).notNull(),
   coverIconUrl: varchar("cover_icon_url"),
@@ -195,7 +201,6 @@ export const landInfo = pgTable("land_info", {
   skipUrl: varchar("skip_url"),
   fillColor: varchar("fill_color").default('#000000').notNull(),
   blockCount: smallint("block_count").default(sql`'1'`).notNull(),
-  landStatus: varchar("land_status").default('0').notNull(),
   showCoverList: jsonb("show_cover_list").array(),
 }, (table) => [
   foreignKey({

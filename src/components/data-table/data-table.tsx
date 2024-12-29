@@ -39,17 +39,17 @@ export function DataTable<TData>({
   return (
     <div
       className={cn(
-        "relative h-[calc(100vh-64px)] w-full space-y-2.5 overflow-auto px-4",
+        "relative h-[calc(100vh-48px)] w-full space-y-2.5 overflow-auto px-4",
         className
       )}
       {...props}
     >
-      <div className="flex z-50 sticky top-0 bg-background border-b h-16">
+      <div className="flex z-50 sticky top-0 bg-background border-b h-14">
         {children}
       </div>
 
       <div className="overflow-hidden rounded-md border">
-        <Table  >
+        <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

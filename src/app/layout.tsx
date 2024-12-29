@@ -8,6 +8,8 @@ import './globals.css';
 import { getServerSession } from 'next-auth';
 import { authOptions } from './api/auth/[...nextauth]/route';
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { fontMono, fontSans } from '@/lib/fonts';
+import { cn } from '@/lib/utils';
 
 export const metadata: Metadata = {
 	title: 'Next Shadcn',
@@ -27,19 +29,25 @@ export default async function RootLayout({
 }) {
 	const session = await getServerSession(authOptions)
 	return (
-		<html
-			lang="en"
-			className={`${lato.className}`}
-			suppressHydrationWarning={true}
-		>
-			<body className="bg-background font-sans antialiased overflow-hidden">
-				<NextTopLoader showSpinner={false} />
-				<Providers session={session}>
-					<ToasterSonner />
-						<DefaultToaster/>
-					<NuqsAdapter>{children}</NuqsAdapter>
-				</Providers>
-			</body>
-		</html>
-	);
+    <html
+      lang="en"
+      className={`${lato.className}`}
+      suppressHydrationWarning={true}
+    >
+      <body
+        className={cn(
+          "min-h-screen bg-background font-sans antialiased",
+          fontSans.variable,
+          fontMono.variable
+        )}
+      >
+        <NextTopLoader showSpinner={false} />
+        <Providers session={session}>
+          <ToasterSonner />
+          <DefaultToaster />
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </Providers>
+      </body>
+    </html>
+  );
 }

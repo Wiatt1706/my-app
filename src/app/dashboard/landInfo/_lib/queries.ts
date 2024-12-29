@@ -37,7 +37,7 @@ export async function getLandInfos(input: GetDataSchema) {
         const where = advancedTable
           ? advancedWhere
           : and(
-            input.landName ? ilike(landInfo.landName, `%${input.landName   }%`) : undefined,
+            input.landName ? ilike(landInfo.landName, `%${input.landName}%`) : undefined,
             input.landType.length > 0
               ? inArray(landInfo.landType, input.landType)
               : undefined,

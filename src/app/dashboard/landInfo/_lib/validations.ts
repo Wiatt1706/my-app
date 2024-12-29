@@ -15,7 +15,7 @@ export const searchParamsCache = createSearchParamsCache({
     []
   ),
   page: parseAsInteger.withDefault(1),
-  perPage: parseAsInteger.withDefault(10),
+  perPage: parseAsInteger.withDefault(5),
   sort: getSortingStateParser<LandInfo>().withDefault([
     { id: "createdAt", desc: true },
   ]),

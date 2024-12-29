@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 
-import { getTypeContent } from "../_lib/utils";
+import { getStatusContent, getTypeContent } from "../_lib/utils";
 import SquareAvatar from "@/components/SquareAvatar";
 import { Icons } from "@/components/icons";
 
@@ -123,6 +123,34 @@ export function getColumns({
         if (!type) return null;
 
         const { icon: Icon, text } = getTypeContent(type);
+
+        return (
+          <div className="flex w-[6.25rem] items-center">
+            <Icon
+              className="mr-2 size-4 text-muted-foreground"
+              aria-hidden="true"
+            />
+            <span className="capitalize">{text}</span>
+          </div>
+        );
+      },
+      filterFn: (row, id, value) => {
+        return Array.isArray(value) && value.includes(row.getValue(id));
+      },
+    },
+    {
+      accessorKey: "landStatus",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Status" />
+      ),
+      cell: ({ row }) => {
+        const status = landInfo.landStatus.enumValues.find(
+          (type) => type === row.original.landStatus
+        );
+
+        if (!status) return null;
+
+        const { icon: Icon, text } = getStatusContent(status);
 
         return (
           <div className="flex w-[6.25rem] items-center">
