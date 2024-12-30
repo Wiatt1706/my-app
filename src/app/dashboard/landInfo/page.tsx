@@ -3,7 +3,7 @@ import { type SearchParams } from "@/types";
 import { getValidFilters } from "@/lib/data-table";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { LandInfosTable } from "./_components/landInfo-table";
-import { getLandInfos, getLandTypeCounts } from "./_lib/queries";
+import { getLandInfos, getLandStatsCounts, getLandTypeCounts } from "./_lib/queries";
 import { searchParamsCache } from "./_lib/validations";
 
 interface IndexPageProps {
@@ -22,6 +22,7 @@ export default async function IndexPage(props: IndexPageProps) {
       filters: validFilters,
     }),
     getLandTypeCounts(),
+    getLandStatsCounts(),
   ]);
 
   return (

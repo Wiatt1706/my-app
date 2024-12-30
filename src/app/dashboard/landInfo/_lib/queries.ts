@@ -1,13 +1,12 @@
 import "server-only"
 
 import { db } from "@/db"
-import { landInfo, type LandInfo } from "@/db/schema"
+import { landInfo } from "@/db/schema"
 import {
   and,
   asc,
   count,
   desc,
-  gt,
   gte,
   ilike,
   inArray,
@@ -18,68 +17,62 @@ import { filterColumns } from "@/lib/filter-columns"
 import { unstable_cache } from "@/lib/unstable-cache"
 
 import { type GetDataSchema } from "./validations"
+import { getGroupedCounts } from "@/lib/db/queries"
 
 export async function getLandInfos(input: GetDataSchema) {
   return await unstable_cache(
     async () => {
       try {
-        const offset = (input.page - 1) * input.perPage
-        const fromDate = input.from ? new Date(input.from) : undefined
-        const toDate = input.to ? new Date(input.to) : undefined
-        const advancedTable = input.flags.includes("advancedTable")
+        const { page, perPage, from, to, flags, filters, joinOperator, landName, landType, landStatus, sort } = input;
+        const offset = (page - 1) * perPage;
 
-        const advancedWhere = filterColumns({
-          table: landInfo,
-          filters: input.filters,
-          joinOperator: input.joinOperator,
-        })
+        const fromDate = from ? new Date(from) : undefined;
+        const toDate = to ? new Date(to) : undefined;
+        const isAdvancedTable = flags.includes("advancedTable");
 
-        const where = advancedTable
-          ? advancedWhere
+        const where = isAdvancedTable
+          ? filterColumns({
+              table: landInfo,
+              filters,
+              joinOperator,
+            })
           : and(
-            input.landName ? ilike(landInfo.landName, `%${input.landName}%`) : undefined,
-            input.landType.length > 0
-              ? inArray(landInfo.landType, input.landType)
-              : undefined,
-            fromDate ? gte(landInfo.createdAt, fromDate.toISOString()) : undefined,
-            toDate ? lte(landInfo.createdAt, toDate.toISOString()) : undefined
-          )
+              landName ? ilike(landInfo.landName, `%${landName}%`) : undefined,
+              landType.length > 0 ? inArray(landInfo.landType, landType) : undefined,
+              landStatus.length > 0 ? inArray(landInfo.landStatus, landStatus) : undefined,
+              fromDate ? gte(landInfo.createdAt, fromDate.toISOString()) : undefined,
+              toDate ? lte(landInfo.createdAt, toDate.toISOString()) : undefined
+            );
 
-        const orderBy =
-          input.sort.length > 0
-            ? input.sort.map((item) =>
-              item.desc ? desc(landInfo[item.id]) : asc(landInfo[item.id])
-            )
-            : [asc(landInfo.createdAt)]
+            const orderBy = sort.length > 0
+            ? sort.map(({ id, desc: isDesc }) => (isDesc ? desc(landInfo[id]) : asc(landInfo[id])))
+            : [asc(landInfo.createdAt)];
 
         const { data, total } = await db.transaction(async (tx) => {
-          const data = await tx
+          const dataPromise = tx
             .select()
             .from(landInfo)
-            .limit(input.perPage)
+            .limit(perPage)
             .offset(offset)
             .where(where)
-            .orderBy(...orderBy)
+            .orderBy(...orderBy);
 
-          const total = await tx
-            .select({
-              count: count(),
-            })
+          const totalPromise = tx
+            .select({ count: count() })
             .from(landInfo)
             .where(where)
             .execute()
-            .then((res) => res[0]?.count ?? 0)
+            .then((res) => res[0]?.count ?? 0);
 
-          return {
-            data,
-            total,
-          }
-        })
+          const [data, total] = await Promise.all([dataPromise, totalPromise]);
+          return { data, total };
+        });
 
-        const pageCount = Math.ceil(total / input.perPage)
-        return { data, pageCount }
-      } catch (err) {
-        return { data: [], pageCount: 0 }
+        const pageCount = Math.ceil(total / perPage);
+        return { data, pageCount };
+      } catch (error) {
+        console.error("Error fetching land infos:", error);
+        return { data: [], pageCount: 0 };
       }
     },
     [JSON.stringify(input)],
@@ -87,37 +80,25 @@ export async function getLandInfos(input: GetDataSchema) {
       revalidate: 3600,
       tags: ["landInfo"],
     }
-  )()
+  )();
 }
 
+// 获取 landType 的统计数据
 export async function getLandTypeCounts() {
-  return unstable_cache(
-    async () => {
-      try {
-        return await db
-          .select({
-            landType: landInfo.landType,
-            count: count(),
-          })
-          .from(landInfo)
-          .groupBy(landInfo.landType)
-          .having(gt(count(), 0))
-          .then((res) =>
-            res.reduce(
-              (acc, { landType, count }) => {
-                acc[landType] = count
-                return acc
-              },
-              {} as Record<LandInfo["landType"], number>
-            )
-          )
-      } catch (err) {
-        return {} as Record<LandInfo["landType"], number>
-      }
-    },
-    ["LandInfo-landType-counts"],
-    {
-      revalidate: 3600,
-    }
-  )()
+  return getGroupedCounts({
+    table: landInfo,
+    groupByField: "landType",
+    cacheKey: "LandInfo-landType-counts",
+    revalidate: 3600,
+  });
+}
+
+// 获取 landStatus 的统计数据
+export async function getLandStatsCounts() {
+  return getGroupedCounts({
+    table: landInfo,
+    groupByField: "landStatus",
+    cacheKey: "LandInfo-landStatus-counts",
+    revalidate: 3600,
+  });
 }

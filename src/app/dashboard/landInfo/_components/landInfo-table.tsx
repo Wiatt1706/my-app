@@ -6,8 +6,8 @@ import type { DataTableFilterField, DataTableRowAction } from "@/types";
 import { useDataTable } from "@/hooks/use-data-table";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
-import type { getLandInfos, getLandTypeCounts } from "../_lib/queries";
-import { getTypeContent } from "../_lib/utils";
+import type { getLandInfos, getLandStatsCounts, getLandTypeCounts } from "../_lib/queries";
+import { getStatusContent, getTypeContent } from "../_lib/utils";
 import { DeleteLandInfosDialog } from "./delete-landInfo-dialog";
 import { getColumns } from "./table-columns";
 import { LandInfoTableToolbarActions } from "./table-toolbar-actions";
@@ -17,13 +17,14 @@ interface LandInfoTableProps {
   promises: Promise<
     [
       Awaited<ReturnType<typeof getLandInfos>>,
-      Awaited<ReturnType<typeof getLandTypeCounts>>
+      Awaited<ReturnType<typeof getLandTypeCounts>>,
+      Awaited<ReturnType<typeof getLandStatsCounts>>
     ]
   >;
 }
 
 export function LandInfosTable({ promises }: LandInfoTableProps) {
-  const [{ data, pageCount }, TypeCounts] = React.use(promises);
+  const [{ data, pageCount }, TypeCounts, StatusCounts] = React.use(promises);
 
   const [rowAction, setRowAction] =
     React.useState<DataTableRowAction<LandInfo> | null>(null);
@@ -49,6 +50,16 @@ export function LandInfosTable({ promises }: LandInfoTableProps) {
         count: TypeCounts[type],
       })),
     },
+    {
+      id: "landStatus",
+      label: "status",
+      options: landInfo.landStatus.enumValues.map((status) => ({
+        label: getStatusContent(status).text,
+        value: status,
+        icon: getStatusContent(status).icon,
+        count: StatusCounts[status],
+      })),
+    },
   ];
 
   const { table } = useDataTable({
@@ -67,7 +78,7 @@ export function LandInfosTable({ promises }: LandInfoTableProps) {
 
   return (
     <>
-      <DataTable table={table}>
+      <DataTable table={table} className="h-[calc(100vh-48px)] px-8">
         <DataTableToolbar table={table} filterFields={filterFields}>
           <LandInfoTableToolbarActions table={table} />
         </DataTableToolbar>

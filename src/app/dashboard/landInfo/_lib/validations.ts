@@ -21,6 +21,7 @@ export const searchParamsCache = createSearchParamsCache({
   ]),
   landName: parseAsString.withDefault(""),
   landType: parseAsArrayOf(z.enum(landInfo.landType.enumValues)).withDefault([]),
+  landStatus: parseAsArrayOf(z.enum(landInfo.landStatus.enumValues)).withDefault([]),
   from: parseAsString.withDefault(""),
   to: parseAsString.withDefault(""),
   // advanced filter
@@ -31,11 +32,13 @@ export const searchParamsCache = createSearchParamsCache({
 export const createSchema = z.object({
   name: z.string(),
   landType: z.enum(landInfo.landType.enumValues),
+  landStatus: z.enum(landInfo.landStatus.enumValues),
 })
 
 export const updateSchema = z.object({
   name: z.string().optional(),
   landType: z.enum(landInfo.landType.enumValues).optional(),
+  landStatus: z.enum(landInfo.landStatus.enumValues).optional(),
 })
 
 export type GetDataSchema = Awaited<ReturnType<typeof searchParamsCache.parse>>
