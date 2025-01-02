@@ -53,6 +53,9 @@ export async function getGroupedCounts<
 			}
 		},
 		[cacheKey],
-		{ revalidate }
+		{
+			revalidate,
+			tags: [cacheKey],
+		}
 	)();
 }

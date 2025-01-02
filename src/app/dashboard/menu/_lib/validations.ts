@@ -1,4 +1,4 @@
-import { landInfo, type LandInfo } from "@/db/schema"
+import { systemMenu, type SystemMenu } from "@/db/schema"
 import {
   createSearchParamsCache,
   parseAsArrayOf,
@@ -11,17 +11,13 @@ import * as z from "zod"
 import { getFiltersStateParser, getSortingStateParser } from "@/lib/parsers"
 
 export const searchParamsCache = createSearchParamsCache({
-  flags: parseAsArrayOf(z.enum(["advancedTable", "floatingBar"])).withDefault(
-    []
-  ),
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(10),
-  sort: getSortingStateParser<LandInfo>().withDefault([
+  sort: getSortingStateParser<SystemMenu>().withDefault([
     { id: "createdAt", desc: true },
   ]),
-  landName: parseAsString.withDefault(""),
-  landType: parseAsArrayOf(z.enum(landInfo.landType.enumValues)).withDefault([]),
-  landStatus: parseAsArrayOf(z.enum(landInfo.landStatus.enumValues)).withDefault([]),
+  title: parseAsString.withDefault(""),
+  url: parseAsString.withDefault(""),
   from: parseAsString.withDefault(""),
   to: parseAsString.withDefault(""),
   // advanced filter
@@ -30,15 +26,13 @@ export const searchParamsCache = createSearchParamsCache({
 })
 
 export const createSchema = z.object({
-  landName: z.string(),
-  landType: z.enum(landInfo.landType.enumValues),
-  landStatus: z.enum(landInfo.landStatus.enumValues),
+  title: z.string(),
+  url: z.string(),
 })
 
 export const updateSchema = z.object({
-  landName: z.string().optional(),
-  landType: z.enum(landInfo.landType.enumValues).optional(),
-  landStatus: z.enum(landInfo.landStatus.enumValues).optional(),
+  title: z.string(),
+  url: z.string(),
 })
 
 export type GetDataSchema = Awaited<ReturnType<typeof searchParamsCache.parse>>

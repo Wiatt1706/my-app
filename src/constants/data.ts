@@ -133,24 +133,8 @@ export const navItems: NavItem[] = [
   {
     title: 'LandInfo',
     url: '/dashboard/landInfo',
-    icon: 'user',
-    shortcut: ['l', 'l'],
-    isActive: false,
-    items: [] // No child items
-  },
-  {
-    title: 'Employee',
-    url: '/dashboard/employee',
-    icon: 'user',
-    shortcut: ['e', 'e'],
-    isActive: false,
-    items: [] // No child items
-  },
-  {
-    title: 'Product',
-    url: '/dashboard/product',
     icon: 'product',
-    shortcut: ['p', 'p'],
+    shortcut: ['l', 'l'],
     isActive: false,
     items: [] // No child items
   },

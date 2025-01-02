@@ -1,24 +1,24 @@
 "use client"
 
-import { type LandInfo } from "@/db/schema"
+import { type SystemMenu } from "@/db/schema"
 import { type Table } from "@tanstack/react-table"
 import { Download } from "lucide-react"
 
 import { exportTableToCSV } from "@/lib/export"
 import { Button } from "@/components/ui/button"
 
-import { DeleteLandInfosDialog } from "./delete-landInfo-dialog";
+import { DeleteSystemMenusDialog } from "./delete-systemMenu-dialog";
 
-interface LandInfoTableToolbarActionsProps {
-  table: Table<LandInfo>;
+interface SystemMenuTableToolbarActionsProps {
+  table: Table<SystemMenu>;
 }
 
-export function LandInfoTableToolbarActions({ table }: LandInfoTableToolbarActionsProps) {
+export function SystemMenuTableToolbarActions({ table }: SystemMenuTableToolbarActionsProps) {
   return (
     <div className="flex items-center gap-2">
       {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-        <DeleteLandInfosDialog
-          lands={table
+        <DeleteSystemMenusDialog
+          menus={table
             .getFilteredSelectedRowModel()
             .rows.map((row) => row.original)}
           onSuccess={() => table.toggleAllRowsSelected(false)}
@@ -29,7 +29,7 @@ export function LandInfoTableToolbarActions({ table }: LandInfoTableToolbarActio
         size="sm"
         onClick={() =>
           exportTableToCSV(table, {
-            filename: "landInfos",
+            filename: "systemMenus",
             excludeColumns: ["select", "actions"],
           })
         }

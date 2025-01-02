@@ -36,7 +36,7 @@ export function getColumns({
 		{
 			accessorKey: "landName",
 			header: ({ column }) => (
-				<DataTableColumnHeader className="" column={column} title="土块" />
+				<DataTableColumnHeader className="mx-2" column={column} title="土块" />
 			),
 			cell: ({ row }) => {
 				const coord =

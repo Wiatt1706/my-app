@@ -37,6 +37,7 @@ import { Textarea } from "@/components/ui/textarea"
 
 import { updateLandInfo } from "../_lib/actions";
 import { updateSchema, type UpdateDataSchema } from "../_lib/validations";
+import { getStatusContent, getTypeContent } from "../_lib/utils"
 
 interface UpdateSheetProps extends React.ComponentPropsWithRef<typeof Sheet> {
   land: LandInfo | null;
@@ -48,10 +49,21 @@ export function UpdateSheet({ land, ...props }: UpdateSheetProps) {
   const form = useForm<UpdateDataSchema>({
     resolver: zodResolver(updateSchema),
     defaultValues: {
-      name: land?.landName ?? "",
+      landName: land?.landName,
       landType: land?.landType,
+      landStatus: land?.landStatus,
     },
   });
+
+  React.useEffect(() => {
+    if (land) {
+      form.reset({
+        landName: land.landName || "",
+        landType: land.landType || "",
+        landStatus: land.landStatus || "",
+      });
+    }
+  }, [land, form]);
 
   function onSubmit(input: UpdateDataSchema) {
     startUpdateTransition(async () => {
@@ -77,9 +89,9 @@ export function UpdateSheet({ land, ...props }: UpdateSheetProps) {
     <Sheet {...props}>
       <SheetContent className="flex flex-col gap-6 sm:max-w-md">
         <SheetHeader className="text-left">
-          <SheetTitle>Update task</SheetTitle>
+          <SheetTitle>Update LandInfo</SheetTitle>
           <SheetDescription>
-            Update the task details and save the changes
+            Update the landInfo details and save the changes
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
@@ -89,7 +101,7 @@ export function UpdateSheet({ land, ...props }: UpdateSheetProps) {
           >
             <FormField
               control={form.control}
-              name="name"
+              name="landName"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Name</FormLabel>
@@ -127,7 +139,40 @@ export function UpdateSheet({ land, ...props }: UpdateSheetProps) {
                             value={item}
                             className="capitalize"
                           >
-                            {item}
+                            {getTypeContent(item).text}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="landStatus"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="capitalize">
+                        <SelectValue placeholder="Select a types" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectGroup>
+                        {landInfo.landStatus.enumValues.map((item) => (
+                          <SelectItem
+                            key={item}
+                            value={item}
+                            className="capitalize"
+                          >
+                            {getStatusContent(item).text}
                           </SelectItem>
                         ))}
                       </SelectGroup>

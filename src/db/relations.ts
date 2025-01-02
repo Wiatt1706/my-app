@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { activities, activitiesUser, profiles, commentRecord, likeRecord, usersInAuth, pxCmtyArticles, landInfo, likes, userCustomList, keyword, rejectRecord, userCustomItem } from "./schema";
+import { activities, activitiesUser, profiles, commentRecord, likeRecord, usersInAuth, pxCmtyArticles, landInfo, likes, userCustomList, keyword, rejectRecord, userCustomItem, systemMenu, systemRoleMenu, systemRole } from "./schema";
 
 export const activitiesUserRelations = relations(activitiesUser, ({one}) => ({
 	activity: one(activities, {
@@ -134,4 +134,31 @@ export const userCustomItemRelations = relations(userCustomItem, ({one}) => ({
 		fields: [userCustomItem.userCustomListId],
 		references: [userCustomList.id]
 	}),
+}));
+
+export const systemMenuRelations = relations(systemMenu, ({one, many}) => ({
+	systemMenu: one(systemMenu, {
+		fields: [systemMenu.parentId],
+		references: [systemMenu.id],
+		relationName: "systemMenu_parentId_systemMenu_id"
+	}),
+	systemMenus: many(systemMenu, {
+		relationName: "systemMenu_parentId_systemMenu_id"
+	}),
+	systemRoleMenus: many(systemRoleMenu),
+}));
+
+export const systemRoleMenuRelations = relations(systemRoleMenu, ({one}) => ({
+	systemMenu: one(systemMenu, {
+		fields: [systemRoleMenu.menuId],
+		references: [systemMenu.id]
+	}),
+	systemRole: one(systemRole, {
+		fields: [systemRoleMenu.roleId],
+		references: [systemRole.id]
+	}),
+}));
+
+export const systemRoleRelations = relations(systemRole, ({many}) => ({
+	systemRoleMenus: many(systemRoleMenu),
 }));

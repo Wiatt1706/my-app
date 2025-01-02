@@ -185,7 +185,7 @@ export function useDataTable<TData>({
     "perPage",
     parseAsInteger
       .withOptions(queryStateOptions)
-      .withDefault(initialState?.pagination?.pageSize ?? 5)
+      .withDefault(initialState?.pagination?.pageSize ?? 10)
   )
   const [sorting, setSorting] = useQueryState(
     "sort",

@@ -363,19 +363,54 @@ export const userCustomItem = pgTable("UserCustomItem", {
   pgPolicy("Enable update for authenticated users only", { as: "permissive", for: "update", to: ["authenticated"] }),
 ]);
 
-export const tasks = pgTable("tasks", {
-  id: varchar({ length: 30 }).primaryKey().notNull(),
-  code: varchar({ length: 128 }).notNull(),
-  title: varchar({ length: 128 }),
-  status: varchar({ length: 30 }).default('todo').notNull(),
-  label: varchar({ length: 30 }).default('bug').notNull(),
-  priority: varchar({ length: 30 }).default('low').notNull(),
-  archived: boolean().default(false).notNull(),
-  createdAt: timestamp("created_at", { mode: 'string' }).defaultNow().notNull(),
-  updatedAt: timestamp("updated_at", { mode: 'string' }).default(sql`CURRENT_TIMESTAMP`),
+export const systemRole = pgTable("system_role", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	name: varchar().notNull(),
+	description: varchar(),
+	isActive: boolean("is_active").default(true).notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+});
+
+export const systemMenu = pgTable("system_menu", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	title: varchar().notNull(),
+	url: varchar(),
+	icon: varchar(),
+	shortcut: jsonb(),
+	isActive: boolean("is_active").default(false).notNull(),
+	parentId: uuid("parent_id"),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 }, (table) => [
-  unique("tasks_code_unique").on(table.code),
+	foreignKey({
+			columns: [table.parentId],
+			foreignColumns: [table.id],
+			name: "system_menu_parent_id_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+]);
+
+export const systemRoleMenu = pgTable("system_role_menu", {
+	id: uuid().defaultRandom().primaryKey().notNull(),
+	roleId: uuid("role_id").notNull(),
+	menuId: uuid("menu_id").notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
+}, (table) => [
+	foreignKey({
+			columns: [table.menuId],
+			foreignColumns: [systemMenu.id],
+			name: "system_role_menu_menu_id_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+			columns: [table.roleId],
+			foreignColumns: [systemRole.id],
+			name: "system_role_menu_role_id_fkey"
+		}).onUpdate("cascade").onDelete("cascade"),
+	unique("system_role_menu_role_id_menu_id_key").on(table.roleId, table.menuId),
 ]);
 
 export type LandInfo = typeof landInfo.$inferSelect
 export type NewLandInfo = typeof landInfo.$inferInsert
+
+export type SystemMenu = typeof systemMenu.$inferSelect
+export type NewSystemMenu = typeof systemMenu.$inferInsert

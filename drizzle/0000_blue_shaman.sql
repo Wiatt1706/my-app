@@ -198,17 +198,33 @@ CREATE TABLE "UserCustomItem" (
 );
 --> statement-breakpoint
 ALTER TABLE "UserCustomItem" ENABLE ROW LEVEL SECURITY;--> statement-breakpoint
-CREATE TABLE "tasks" (
-	"id" varchar(30) PRIMARY KEY NOT NULL,
-	"code" varchar(128) NOT NULL,
-	"title" varchar(128),
-	"status" varchar(30) DEFAULT 'todo' NOT NULL,
-	"label" varchar(30) DEFAULT 'bug' NOT NULL,
-	"priority" varchar(30) DEFAULT 'low' NOT NULL,
-	"archived" boolean DEFAULT false NOT NULL,
-	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT CURRENT_TIMESTAMP,
-	CONSTRAINT "tasks_code_unique" UNIQUE("code")
+CREATE TABLE "system_role" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" varchar NOT NULL,
+	"description" varchar,
+	"is_active" boolean DEFAULT true NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "system_menu" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"title" varchar NOT NULL,
+	"url" varchar,
+	"icon" varchar,
+	"shortcut" jsonb,
+	"is_active" boolean DEFAULT false NOT NULL,
+	"parent_id" uuid,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now()
+);
+--> statement-breakpoint
+CREATE TABLE "system_role_menu" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"role_id" uuid NOT NULL,
+	"menu_id" uuid NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "system_role_menu_role_id_menu_id_key" UNIQUE("role_id","menu_id")
 );
 --> statement-breakpoint
 ALTER TABLE "ActivitiesUser" ADD CONSTRAINT "ActivitiesUser_activity_id_fkey" FOREIGN KEY ("activity_id") REFERENCES "public"."Activities"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
@@ -229,6 +245,9 @@ ALTER TABLE "PxCmtyArticles" ADD CONSTRAINT "PxCmtyArticles_user_id_fkey" FOREIG
 ALTER TABLE "RejectRecord" ADD CONSTRAINT "rejectrecord_post_id_fkey" FOREIGN KEY ("post_id") REFERENCES "public"."PxCmtyArticles"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "UserCustomItem" ADD CONSTRAINT "UserCustomItem_land_id_fkey" FOREIGN KEY ("land_id") REFERENCES "public"."land_info"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "UserCustomItem" ADD CONSTRAINT "UserCustomItem_user_custom_list_id_fkey" FOREIGN KEY ("user_custom_list_id") REFERENCES "public"."UserCustomList"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "system_menu" ADD CONSTRAINT "system_menu_parent_id_fkey" FOREIGN KEY ("parent_id") REFERENCES "public"."system_menu"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "system_role_menu" ADD CONSTRAINT "system_role_menu_menu_id_fkey" FOREIGN KEY ("menu_id") REFERENCES "public"."system_menu"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE "system_role_menu" ADD CONSTRAINT "system_role_menu_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "public"."system_role"("id") ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 CREATE POLICY "Enable insert for authenticated users only" ON "ActivitiesUser" AS PERMISSIVE FOR INSERT TO "authenticated" WITH CHECK (true);--> statement-breakpoint
 CREATE POLICY "Enable read access for all users" ON "ActivitiesUser" AS PERMISSIVE FOR SELECT TO public;--> statement-breakpoint
 CREATE POLICY "Enable delete for authenticated users only" ON "LikeRecord" AS PERMISSIVE FOR DELETE TO "authenticated" USING (true);--> statement-breakpoint
