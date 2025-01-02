@@ -5,18 +5,19 @@ import { type SystemMenu } from "@/db/schema";
 import type { DataTableAdvancedFilterField, DataTableFilterField, DataTableRowAction } from "@/types";
 import { useDataTable } from "@/hooks/use-data-table";
 import { DataTable } from "@/components/data-table/data-table";
-import type { getSystemMenus} from "../_lib/queries";
+import type { getSystemMenusWithChildren, SystemMenuWithChildren} from "../_lib/queries";
 import { DeleteSystemMenusDialog } from "./delete-systemMenu-dialog";
 import { getColumns } from "./table-columns";
 import { SystemMenuTableToolbarActions } from "./table-toolbar-actions";
 import { UpdateSheet } from "./update-systemMenu-sheet";
 import { DataTableAdvancedToolbar } from "@/components/data-table/data-table-advanced-toolbar";
 import { TableFloatingBar } from "./table-floating-bar";
+import { getExpandedRowModel } from "@tanstack/react-table";
 
 interface SystemMenuTableProps {
   promises: Promise<
     [
-      Awaited<ReturnType<typeof getSystemMenus>>,
+      Awaited<ReturnType<typeof getSystemMenusWithChildren>>,
     ]
   >;
 }
@@ -58,6 +59,8 @@ export function MenuTable({ promises }: SystemMenuTableProps) {
     }
   ];
 
+  console.log("data", data);
+  
   const { table } = useDataTable({
     data,
     columns,
@@ -71,9 +74,10 @@ export function MenuTable({ promises }: SystemMenuTableProps) {
     getRowId: (originalRow) => originalRow.id,
     shallow: false,
     clearOnDefault: true,
+    getSubRows: (originalRow) => (originalRow as SystemMenuWithChildren).children,
+    getExpandedRowModel: getExpandedRowModel(),
+    getRowCanExpand: (row) => !!((row.original as SystemMenuWithChildren).children?.length)
   });
-
-
 
   return (
     <>

@@ -1,15 +1,10 @@
 import "server-only"
 
 import { db } from "@/db"
-import { systemMenu } from "@/db/schema"
+import { SystemMenu, systemMenu } from "@/db/schema"
 import {
-  and,
   asc,
-  count,
   desc,
-  gte,
-  ilike,
-  lte,
 } from "drizzle-orm"
 
 import { filterColumns } from "@/lib/filter-columns"
@@ -17,46 +12,69 @@ import { unstable_cache } from "@/lib/unstable-cache"
 
 import { type GetDataSchema } from "./validations"
 
-export async function getSystemMenus(input: GetDataSchema) {
+export interface SystemMenuWithChildren extends SystemMenu {
+  children: SystemMenu[];
+}
+
+export async function getSystemMenusWithChildren(input: GetDataSchema) {
   return await unstable_cache(
     async () => {
       try {
-        const { page, perPage, from, to, filters, joinOperator, title, url, sort } = input;
+        const { page, perPage, filters, joinOperator, sort } = input;
         const offset = (page - 1) * perPage;
 
         const where = filterColumns({
           table: systemMenu,
           filters,
           joinOperator,
-        })
-            const orderBy = sort.length > 0
-            ? sort.map(({ id, desc: isDesc }) => (isDesc ? desc(systemMenu[id]) : asc(systemMenu[id])))
-            : [asc(systemMenu.createdAt)];
-
-        const { data, total } = await db.transaction(async (tx) => {
-          const dataPromise = tx
-            .select()
-            .from(systemMenu)
-            .limit(perPage)
-            .offset(offset)
-            .where(where)
-            .orderBy(...orderBy);
-
-          const totalPromise = tx
-            .select({ count: count() })
-            .from(systemMenu)
-            .where(where)
-            .execute()
-            .then((res) => res[0]?.count ?? 0);
-
-          const [data, total] = await Promise.all([dataPromise, totalPromise]);
-          return { data, total };
         });
 
-        const pageCount = Math.ceil(total / perPage);
-        return { data, pageCount };
+        const orderBy =
+          sort.length > 0
+            ? sort.map(({ id, desc: isDesc }) =>
+                isDesc ? desc(systemMenu[id]) : asc(systemMenu[id])
+              )
+            : [asc(systemMenu.menuSort), asc(systemMenu.createdAt)];
+
+        // Fetch all menus
+        const allMenus = await db
+          .select()
+          .from(systemMenu)
+          .where(where)
+          .orderBy(...orderBy);
+
+        // Build nested structure
+        const menuMap = new Map<string, SystemMenuWithChildren>();
+
+        // Initialize menuMap with all menus
+        allMenus.forEach((menu) => {
+          menuMap.set(menu.id, { ...menu, children: [] });
+        });
+
+        const rootMenus: SystemMenuWithChildren[] = [];
+
+        // Establish parent-child relationships
+        allMenus.forEach((menu) => {
+          if (menu.parentId) {
+            const parent = menuMap.get(menu.parentId);
+            if (parent) {
+              parent.children.push(menuMap.get(menu.id)!);
+            }
+          } else {
+            rootMenus.push(menuMap.get(menu.id)!);
+          }
+        });
+
+        // Pagination
+        const paginatedMenus = rootMenus.slice(offset, offset + perPage);
+        const pageCount = Math.ceil(rootMenus.length / perPage);
+
+        console.log("Root menus:", JSON.stringify(paginatedMenus, null, 2));
+
+        
+        return { data: paginatedMenus, pageCount };
       } catch (error) {
-        console.error("Error fetching infos:", error);
+        console.error("Error fetching menus:", error);
         return { data: [], pageCount: 0 };
       }
     },

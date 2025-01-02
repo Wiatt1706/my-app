@@ -4,7 +4,7 @@ import * as React from "react";
 import { systemMenu, type SystemMenu } from "@/db/schema";
 import { type DataTableRowAction } from "@/types";
 import { type ColumnDef } from "@tanstack/react-table";
-import { Ellipsis } from "lucide-react";
+import { ChevronRight, Ellipsis } from "lucide-react";
 
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
+import { Icons } from "@/components/icons";
 
 interface GetColumnsProps {
 	setRowAction: React.Dispatch<
@@ -30,42 +31,72 @@ export function getColumns({
 }: GetColumnsProps): ColumnDef<SystemMenu>[] {
 	return [
 		{
-			id: "select",
-			header: ({ table }) => (
-			  <Checkbox
-				checked={
-				  table.getIsAllPageRowsSelected() ||
-				  (table.getIsSomePageRowsSelected() && "indeterminate")
-				}
-				onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-				aria-label="Select all"
-				className="translate-y-0.5"
-			  />
+			accessorKey: 'title',
+			header: ({ column, table }) => (
+			  <div className="flex items-center gap-2">
+				<Checkbox
+				  checked={
+					table.getIsAllPageRowsSelected() ||
+					(table.getIsSomePageRowsSelected() && "indeterminate")
+				  }
+				  onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+				  aria-label="Select all"
+				/>
+				<button
+				  {...{
+					onClick: table.getToggleAllRowsExpandedHandler(),
+				  }}
+				  className="p-1 rounded transition-transform duration-200 
+							  focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-gray-200"
+				  aria-label="Toggle expand"
+				>
+				  <ChevronRight
+					className={`w-4 h-4 transition-transform duration-200 ${
+					  table.getIsAllRowsExpanded() ? "rotate-90" : ""
+					}`}
+				  />
+				</button>
+				<DataTableColumnHeader className="ml-2" column={column} title="title" />
+			  </div>
 			),
 			cell: ({ row }) => (
-			  <Checkbox
-				checked={row.getIsSelected()}
-				onCheckedChange={(value) => row.toggleSelected(!!value)}
-				aria-label="Select row"
-				className="translate-y-0.5"
-			  />
+			  <div
+				style={{
+				  paddingLeft: `${row.depth * 2}rem`,
+				}}
+			  >
+				<div className="flex items-center gap-2">
+				  <Checkbox
+					checked={row.getIsSelected()}
+					onCheckedChange={(value) => row.toggleSelected(!!value)}
+					aria-label="Select row"
+				  />
+				  {row.getCanExpand() ? (
+					<button
+					  onClick={row.getToggleExpandedHandler()}
+					  className="p-1 rounded transition-transform duration-200 
+								  focus:outline-none focus:ring-2 focus:ring-blue-500 hover:bg-gray-200"
+					  aria-label="Toggle expand"
+					>
+					  <ChevronRight
+						className={`w-4 h-4 transition-transform duration-200 ${
+						  row.getIsExpanded() ? "rotate-90" : ""
+						}`}
+					  />
+					</button>
+				  ) : (
+					<span className=""></span> // 空白占位符
+				  )}
+				  <span>{row.getValue("title")}</span>
+				</div>
+			  </div>
 			),
-			enableSorting: false,
-			enableHiding: false,
-		},
-		{
-			accessorKey: "title",
-			header: ({ column }) => (
-			  <DataTableColumnHeader column={column} title="title" />
-			),
-			cell: ({ row }) => <div className="w-20">{row.getValue("title")}</div>,
-			enableSorting: false,
-			enableHiding: false,
+			footer: (props) => props.column.id,
 		},
 		{
 			accessorKey: "url",
 			header: ({ column }) => (
-			  <DataTableColumnHeader column={column} title="url" />
+				<DataTableColumnHeader column={column} title="url" />
 			),
 			cell: ({ row }) => <div className="w-20">{row.getValue("url")}</div>,
 			enableSorting: false,
@@ -74,9 +105,13 @@ export function getColumns({
 		{
 			accessorKey: "icon",
 			header: ({ column }) => (
-			  <DataTableColumnHeader column={column} title="icon" />
+				<DataTableColumnHeader column={column} title="图标" />
 			),
-			cell: ({ row }) => <div className="w-20">{row.getValue("icon")}</div>,
+			cell: ({ row }) => {
+				const icon = row.getValue("icon") as keyof typeof Icons; 
+				const Icon = icon ? Icons[icon] : Icons.logo;
+				return <div className="w-20">{<Icon className="size-4" />}</div>
+			},
 			enableSorting: false,
 			enableHiding: false,
 		},
@@ -86,7 +121,6 @@ export function getColumns({
 				<DataTableColumnHeader column={column} title="Created At" />
 			),
 			cell: ({ cell }) => formatDate(cell.getValue() as Date),
-      size: 40,
 		},
 		{
 			id: "actions",

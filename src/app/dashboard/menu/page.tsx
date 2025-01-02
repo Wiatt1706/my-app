@@ -3,7 +3,7 @@ import { type SearchParams } from "@/types";
 import { getValidFilters } from "@/lib/data-table";
 import { DataTableSkeleton } from "@/components/data-table/data-table-skeleton";
 import { MenuTable } from "./_components/menu-table";
-import { getSystemMenus } from "./_lib/queries";
+import { getSystemMenusWithChildren } from "./_lib/queries";
 import { searchParamsCache } from "./_lib/validations";
 
 interface IndexPageProps {
@@ -17,7 +17,7 @@ export default async function IndexPage(props: IndexPageProps) {
   const validFilters = getValidFilters(search.filters);
 
   const promises = Promise.all([
-    getSystemMenus({
+    getSystemMenusWithChildren({
       ...search,
       filters: validFilters,
     }),

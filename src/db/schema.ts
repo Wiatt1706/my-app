@@ -380,6 +380,13 @@ export const systemMenu = pgTable("system_menu", {
 	shortcut: jsonb(),
 	isActive: boolean("is_active").default(false).notNull(),
 	parentId: uuid("parent_id"),
+  menuType: varchar("menu_type", {
+    length: 30,
+    enum: ["0", "1", "2", "3"],
+  })
+    .notNull()
+    .default("0"),
+  menuSort: integer("menu_sort").default(0).notNull(),
 	createdAt: timestamp("created_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 	updatedAt: timestamp("updated_at", { withTimezone: true, mode: 'string' }).defaultNow(),
 }, (table) => [
