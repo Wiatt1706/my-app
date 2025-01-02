@@ -382,7 +382,7 @@ export const systemMenu = pgTable("system_menu", {
 	parentId: uuid("parent_id"),
   menuType: varchar("menu_type", {
     length: 30,
-    enum: ["0", "1", "2", "3"],
+    enum: ["0", "1"],
   })
     .notNull()
     .default("0"),
