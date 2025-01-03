@@ -24,28 +24,22 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { SystemMenuWithChildren } from "@/app/dashboard/_lib/queries";
+import { RenderIcon } from "./icons";
 
-export function NavProjects({
-  projects,
-}: {
-  projects: {
-    name: string
-    url: string
-    icon: LucideIcon
-  }[]
-}) {
-  const { isMobile } = useSidebar()
+export function NavProjects({ projects }: { projects: SystemMenuWithChildren[] }) {
+  const { isMobile } = useSidebar();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Projects</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => (
-          <SidebarMenuItem key={item.name}>
+          <SidebarMenuItem key={item.id}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
-                <item.icon />
-                <span>{item.name}</span>
+              <a href={item.url as string}>
+                {RenderIcon(item.icon as string)}
+                <span>{item.title}</span>
               </a>
             </SidebarMenuButton>
             <DropdownMenu>
@@ -85,5 +79,5 @@ export function NavProjects({
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarGroup>
-  )
+  );
 }

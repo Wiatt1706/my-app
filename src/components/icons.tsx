@@ -192,3 +192,12 @@ export const Icons = {
     </svg>
   ),
 };
+
+export const RenderIcon = (iconKey: string | undefined): React.ReactNode => {
+  if (!iconKey || !(iconKey in Icons)) {
+    // 处理不存在的 iconKey 或无效的情况
+    return null;
+  }
+  const Icon = Icons[iconKey as keyof typeof Icons];
+  return <Icon className="size-4" />;
+};

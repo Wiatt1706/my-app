@@ -1,9 +1,12 @@
 import KBar from "@/components/kbar";
 import AppSidebar from "@/components/layout/app-sidebar";
 import Header from "@/components/layout/header";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarMenuSkeleton, SidebarProvider } from "@/components/ui/sidebar";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { getNavMenus } from "./_lib/queries";
+import { DataTableSkeleton } from "@/components/ui/table/data-table-skeleton";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Next Shadcn Dashboard Starter",
@@ -18,10 +21,17 @@ export default async function DashboardLayout({
   // Persisting the sidebar state in the cookie.
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
+
+  const promises = Promise.all([
+    getNavMenus(),
+  ]);
+
   return (
     <KBar>
       <SidebarProvider defaultOpen={defaultOpen}>
-        <AppSidebar />
+        <Suspense fallback={<SidebarMenuSkeleton showIcon={true} />}>
+          <AppSidebar promises={promises} />
+        </Suspense>
         <SidebarInset>
           <Header />
           {/* page main content */}
