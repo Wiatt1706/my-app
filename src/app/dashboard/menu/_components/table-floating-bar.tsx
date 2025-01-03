@@ -27,7 +27,8 @@ interface SystemMenuTableFloatingBarProps {
 }
 
 export function TableFloatingBar({ table }: SystemMenuTableFloatingBarProps) {
-  const rows = table.getFilteredSelectedRowModel().rows;
+
+  const rows = table.getFilteredSelectedRowModel().flatRows;
 
   const [isPending, startTransition] = React.useTransition();
   const [action, setAction] = React.useState<
@@ -117,7 +118,6 @@ export function TableFloatingBar({ table }: SystemMenuTableFloatingBarProps) {
                     className="size-7 border"
                     onClick={() => {
                       setAction("delete");
-
                       startTransition(async () => {
                         const { error } = await deleteSystemMenus({
                           ids: rows.map((row) => row.original.id),

@@ -10,38 +10,37 @@ import { Button } from "@/components/ui/button"
 import { DeleteSystemMenusDialog } from "./delete-systemMenu-dialog";
 
 interface SystemMenuTableToolbarActionsProps {
-  table: Table<SystemMenu>;
+	table: Table<SystemMenu>;
 }
 
 export function SystemMenuTableToolbarActions({ table }: SystemMenuTableToolbarActionsProps) {
-  return (
-    <div className="flex items-center gap-2">
-      {table.getFilteredSelectedRowModel().rows.length > 0 ? (
-        <DeleteSystemMenusDialog
-          menus={table
-            .getFilteredSelectedRowModel()
-            .rows.map((row) => row.original)}
-          onSuccess={() => table.toggleAllRowsSelected(false)}
-        />
-      ) : null}
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() =>
-          exportTableToCSV(table, {
-            filename: "systemMenus",
-            excludeColumns: ["select", "actions"],
-          })
-        }
-        className="gap-2"
-      >
-        <Download className="size-4" aria-hidden="true" />
-        Export
-      </Button>
-      {/**
-       * Other actions can be added here.
-       * For example, import, view, etc.
-       */}
-    </div>
-  );
+
+	return (
+		<div className="flex items-center gap-2">
+			{table.getFilteredSelectedRowModel().flatRows.length > 0 ? (
+			<DeleteSystemMenusDialog
+				menus={table.getFilteredSelectedRowModel().flatRows.map((row) => row.original)}
+				onSuccess={() => table.toggleAllRowsSelected(false)}
+			/>
+			) : null}
+			<Button
+				variant="outline"
+				size="sm"
+				onClick={() =>
+					exportTableToCSV(table, {
+						filename: "systemMenus",
+						excludeColumns: ["select", "actions"],
+					})
+				}
+				className="gap-2"
+			>
+				<Download className="size-4" aria-hidden="true" />
+				Export
+			</Button>
+			{/**
+				* Other actions can be added here.
+				* For example, import, view, etc.
+				*/}
+		</div>
+	);
 }

@@ -39,8 +39,8 @@ export function exportTableToCSV<TData>(
   const csvContent = [
     headers.join(","),
     ...(onlySelected
-      ? table.getFilteredSelectedRowModel().rows
-      : table.getRowModel().rows
+      ? table.getFilteredSelectedRowModel().flatRows
+      : table.getRowModel().flatRows
     ).map((row) =>
       headers
         .map((header) => {

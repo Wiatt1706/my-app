@@ -69,9 +69,6 @@ export async function getSystemMenusWithChildren(input: GetDataSchema) {
         const paginatedMenus = rootMenus.slice(offset, offset + perPage);
         const pageCount = Math.ceil(rootMenus.length / perPage);
 
-        console.log("Root menus:", JSON.stringify(paginatedMenus, null, 2));
-
-        
         return { data: paginatedMenus, pageCount };
       } catch (error) {
         console.error("Error fetching menus:", error);

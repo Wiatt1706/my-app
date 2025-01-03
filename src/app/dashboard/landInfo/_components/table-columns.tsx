@@ -148,7 +148,7 @@ export function getColumns({
 				<DataTableColumnHeader column={column} title="Created At" />
 			),
 			cell: ({ cell }) => formatDate(cell.getValue() as Date),
-      size: 40,
+      		size: 40,
 		},
 		{
 			id: "actions",

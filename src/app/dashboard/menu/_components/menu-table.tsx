@@ -12,7 +12,7 @@ import { SystemMenuTableToolbarActions } from "./table-toolbar-actions";
 import { UpdateSheet } from "./update-systemMenu-sheet";
 import { DataTableAdvancedToolbar } from "@/components/data-table/data-table-advanced-toolbar";
 import { TableFloatingBar } from "./table-floating-bar";
-import { getExpandedRowModel } from "@tanstack/react-table";
+import { getExpandedRowModel, getPaginationRowModel } from "@tanstack/react-table";
 
 interface SystemMenuTableProps {
   promises: Promise<
@@ -51,38 +51,27 @@ export function MenuTable({ promises }: SystemMenuTableProps) {
     },
   ];
 
-  const filterFields: DataTableFilterField<SystemMenu>[] = [
-    {
-      id: "title",
-      label: "title",
-      placeholder: "Filter titles...",
-    }
-  ];
-
-  console.log("data", data);
-  
   const { table } = useDataTable({
     data,
     columns,
     pageCount,
-    filterFields,
     enableAdvancedFilter: true,
     initialState: {
       sorting: [{ id: "createdAt", desc: true }],
-      columnPinning: { right: ["actions"] },
+      columnPinning: { right: ["actions"], left: ["title"] },
     },
     getRowId: (originalRow) => originalRow.id,
     shallow: false,
     clearOnDefault: true,
     getSubRows: (originalRow) => (originalRow as SystemMenuWithChildren).children,
     getExpandedRowModel: getExpandedRowModel(),
-    getRowCanExpand: (row) => !!((row.original as SystemMenuWithChildren).children?.length)
+    getRowCanExpand: (row) => !!((row.original as SystemMenuWithChildren).children?.length),
   });
 
   return (
     <>
       <DataTable
-        className="h-[calc(100vh-48px)] px-8"
+        className="h-[calc(100vh-48px)]"
         table={table} 
         floatingBar={
           <TableFloatingBar table={table} />

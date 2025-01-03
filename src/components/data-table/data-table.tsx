@@ -1,5 +1,5 @@
 import * as React from "react";
-import { flexRender, type Table as TanstackTable } from "@tanstack/react-table";
+import { flexRender, Row, Table as ReactTable, type Table as TanstackTable } from "@tanstack/react-table";
 
 import { getCommonPinningStyles } from "@/lib/data-table";
 import { cn } from "@/lib/utils";
@@ -49,7 +49,7 @@ export function DataTable<TData>({
 			</div>
 
 			<div className="overflow-hidden rounded-md border">
-				<Table>
+				<Table >
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
 							<TableRow key={headerGroup.id}>
@@ -111,7 +111,7 @@ export function DataTable<TData>({
 			</div>
 			<div className="flex flex-col gap-2.5 z-50 sticky bottom-0 bg-background border-t shrink-0 items-center ">
 				<DataTablePagination table={table} className="py-4" />
-				{table.getFilteredSelectedRowModel().rows.length > 0 && floatingBar}
+				{table.getFilteredSelectedRowModel().flatRows.length > 0 && floatingBar}
 			</div>
 		</div>
 	);
