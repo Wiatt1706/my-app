@@ -1,7 +1,6 @@
 import { systemMenu, type SystemMenu } from "@/db/schema"
 import {
   createSearchParamsCache,
-  parseAsArrayOf,
   parseAsInteger,
   parseAsString,
   parseAsStringEnum,
@@ -33,6 +32,7 @@ export const createSchema = z.object({
 export const updateSchema = z.object({
   title: z.string().optional(),
   url: z.string().optional(),
+  menuSort: z.number().optional(),
   isActive: z.boolean().optional(),
 })
 

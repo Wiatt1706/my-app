@@ -34,7 +34,7 @@ export async function getSystemMenusWithChildren(input: GetDataSchema) {
             ? sort.map(({ id, desc: isDesc }) =>
                 isDesc ? desc(systemMenu[id]) : asc(systemMenu[id])
               )
-            : [asc(systemMenu.menuSort), asc(systemMenu.createdAt)];
+            : [asc(systemMenu.menuSort), asc(systemMenu.id)];
 
         // Fetch all menus
         const allMenus = await db

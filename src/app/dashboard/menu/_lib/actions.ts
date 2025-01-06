@@ -15,10 +15,12 @@ export async function updateSystemMenu(input: UpdateDataSchema & { id: string })
 			.set({
 				title: input.title,
 				url: input.url,
+				menuSort: input.menuSort,
 				isActive: input.isActive,
 			})
 			.where(eq(systemMenu.id, input.id))
 
+		console.log("data-isActive", input);
 		revalidateTag("systemMenu")
 		revalidateTag("navMenu")
 

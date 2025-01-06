@@ -160,7 +160,7 @@ export function getColumns({
     {
       id: "actions",
       cell: function Cell({ row }) {
-		const [isUpdatePending, startUpdateTransition] = React.useTransition()
+        const [isUpdatePending, startUpdateTransition] = React.useTransition();
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -178,45 +178,43 @@ export function getColumns({
               >
                 Edit
               </DropdownMenuItem>
-			  <DropdownMenuSub>
+              <DropdownMenuSub>
                 <DropdownMenuSubTrigger>是否默认打开</DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                   <DropdownMenuRadioGroup
                     value={row.original.isActive.toString()}
                     onValueChange={(value) => {
-						const booleanValue = Boolean(value); // 确保 value 是布尔类型
-						startUpdateTransition(() => {
-						  toast.promise(
-							updateSystemMenu({
-							  id: row.original.id,
-							  isActive: booleanValue, // 使用确保为布尔类型的值
-							}),
-							{
-							  loading: "Updating...",
-							  success: "Label updated",
-							  error: (err) => getErrorMessage(err),
-							}
-						  );
-						});
-					  }}
-					  
+                      startUpdateTransition(() => {
+                        toast.promise(
+                          updateSystemMenu({
+                            id: row.original.id,
+                            isActive: value === "true", // 使用确保为布尔类型的值
+                          }),
+                          {
+                            loading: "Updating...",
+                            success: "Label updated",
+                            error: (err) => getErrorMessage(err),
+                          }
+                        );
+                      });
+                    }}
                   >
-                      <DropdownMenuRadioItem
-                        key="true"
-                        value="true"
-                        className="capitalize"
-                        disabled={isUpdatePending}
-                      >
-                        打开
-                      </DropdownMenuRadioItem>
-					  <DropdownMenuRadioItem
-						key="false"
-						value="false"
-						className="capitalize"
-						disabled={isUpdatePending}
-					  >
-						关闭
-					  </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      key="true"
+                      value="true"
+                      className="capitalize"
+                      disabled={isUpdatePending}
+                    >
+                      Yes
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem
+                      key="false"
+                      value="false"
+                      className="capitalize"
+                      disabled={isUpdatePending}
+                    >
+                      No
+                    </DropdownMenuRadioItem>
                   </DropdownMenuRadioGroup>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
