@@ -31,8 +31,9 @@ export const createSchema = z.object({
 })
 
 export const updateSchema = z.object({
-  title: z.string(),
-  url: z.string(),
+  title: z.string().optional(),
+  url: z.string().optional(),
+  isActive: z.boolean().optional(),
 })
 
 export type GetDataSchema = Awaited<ReturnType<typeof searchParamsCache.parse>>

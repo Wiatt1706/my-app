@@ -81,7 +81,7 @@ export function UpdateSheet({ land, ...props }: UpdateSheetProps) {
 
       form.reset();
       props.onOpenChange?.(false);
-      toast.success("Task updated");
+      toast.success("landInfo updated");
     });
   }
 

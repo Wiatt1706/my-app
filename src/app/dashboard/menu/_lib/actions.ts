@@ -3,8 +3,7 @@
 import { revalidateTag, unstable_noStore } from "next/cache"
 import { db } from "@/db/index"
 import { systemMenu, type SystemMenu } from "@/db/schema"
-import { takeFirstOrThrow } from "@/db/utils"
-import { asc, eq, inArray, not } from "drizzle-orm"
+import { eq, inArray } from "drizzle-orm"
 import { getErrorMessage } from "@/lib/handle-error"
 import type { UpdateDataSchema } from "./validations"
 
@@ -16,12 +15,12 @@ export async function updateSystemMenu(input: UpdateDataSchema & { id: string })
 			.set({
 				title: input.title,
 				url: input.url,
+				isActive: input.isActive,
 			})
 			.where(eq(systemMenu.id, input.id))
-			
-			.then(takeFirstOrThrow)
 
 		revalidateTag("systemMenu")
+		revalidateTag("navMenu")
 
 		return {
 			data: null,

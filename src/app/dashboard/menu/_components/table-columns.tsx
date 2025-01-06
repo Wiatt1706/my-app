@@ -13,14 +13,22 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header";
 import { RenderIcon } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 import { getMenuTypeContent } from "../_lib/utils";
+import { toast } from "sonner";
+import { updateSystemMenu } from "../_lib/actions";
+import { getErrorMessage } from "@/lib/handle-error";
 
 interface GetColumnsProps {
   setRowAction: React.Dispatch<
@@ -152,6 +160,7 @@ export function getColumns({
     {
       id: "actions",
       cell: function Cell({ row }) {
+		const [isUpdatePending, startUpdateTransition] = React.useTransition()
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -169,6 +178,48 @@ export function getColumns({
               >
                 Edit
               </DropdownMenuItem>
+			  <DropdownMenuSub>
+                <DropdownMenuSubTrigger>是否默认打开</DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuRadioGroup
+                    value={row.original.isActive.toString()}
+                    onValueChange={(value) => {
+						const booleanValue = Boolean(value); // 确保 value 是布尔类型
+						startUpdateTransition(() => {
+						  toast.promise(
+							updateSystemMenu({
+							  id: row.original.id,
+							  isActive: booleanValue, // 使用确保为布尔类型的值
+							}),
+							{
+							  loading: "Updating...",
+							  success: "Label updated",
+							  error: (err) => getErrorMessage(err),
+							}
+						  );
+						});
+					  }}
+					  
+                  >
+                      <DropdownMenuRadioItem
+                        key="true"
+                        value="true"
+                        className="capitalize"
+                        disabled={isUpdatePending}
+                      >
+                        打开
+                      </DropdownMenuRadioItem>
+					  <DropdownMenuRadioItem
+						key="false"
+						value="false"
+						className="capitalize"
+						disabled={isUpdatePending}
+					  >
+						关闭
+					  </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onSelect={() => setRowAction({ row, type: "delete" })}

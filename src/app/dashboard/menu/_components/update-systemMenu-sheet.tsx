@@ -63,6 +63,8 @@ export function UpdateSheet({ menu, ...props }: UpdateSheetProps) {
 				...input,
 			});
 
+			console.log("error", error);
+			
 			if (error) {
 				toast.error(error);
 				return;
@@ -70,7 +72,7 @@ export function UpdateSheet({ menu, ...props }: UpdateSheetProps) {
 
 			form.reset();
 			props.onOpenChange?.(false);
-			toast.success("Task updated");
+			toast.success("Menu updated");
 		});
 	}
 
