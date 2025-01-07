@@ -13,7 +13,7 @@ export const searchParamsCache = createSearchParamsCache({
   page: parseAsInteger.withDefault(1),
   perPage: parseAsInteger.withDefault(10),
   sort: getSortingStateParser<SystemMenu>().withDefault([
-    { id: "createdAt", desc: true },
+    {id:"menuSort",desc:false},
   ]),
   title: parseAsString.withDefault(""),
   url: parseAsString.withDefault(""),
@@ -30,6 +30,7 @@ export const createSchema = z.object({
 })
 
 export const updateSchema = z.object({
+  icon: z.string().optional(),
   title: z.string().optional(),
   url: z.string().optional(),
   menuSort: z.number().optional(),

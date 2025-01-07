@@ -16,7 +16,7 @@ export async function getNavMenus() {
   return await unstable_cache(
     async () => {
       try {
-        const orderBy = [asc(systemMenu.menuSort), asc(systemMenu.id)];
+        const orderBy = [asc(systemMenu.menuSort)];
 
         // Fetch all menus
         const allMenus = await db
