@@ -26,8 +26,9 @@ import {
 	SheetTitle,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-import { createSystemMenu, updateSystemMenu } from "../_lib/actions";
+import { createSystemMenu } from "../_lib/actions";
 import {
+  createSchema,
 	updateSchema,
 	type CreateDataSchema,
 } from "../_lib/validations";
@@ -39,21 +40,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getMenuTypeContent } from "../_lib/utils";
 import { Switch } from "@/components/ui/switch";
 
-
-
 export function CreateSheet({ ...props }) {
 	const [isPending, startTransition] = React.useTransition();
 	const [searchTerm, setSearchTerm] = React.useState<string>("");
 
 		const form = useForm<CreateDataSchema>({
-			resolver: zodResolver(updateSchema),
-			defaultValues: {
-				icon: "",
-				title: "",
-				url: "",
-				menuSort: 0,
-			},
-			});
+      resolver: zodResolver(createSchema),
+      defaultValues: {
+        menuSort: 0,
+      },
+    });
 
 
 	function onSubmit(input: CreateDataSchema) {

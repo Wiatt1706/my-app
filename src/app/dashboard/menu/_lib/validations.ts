@@ -25,11 +25,11 @@ export const searchParamsCache = createSearchParamsCache({
 })
 
 export const createSchema = z.object({
-  icon: z.string(),
+  icon: z.string().optional(),
   title: z.string(),
   url: z.string(),
-  menuSort: z.number(),
-  isActive: z.boolean(),
+  menuSort: z.number().optional(),
+  isActive: z.boolean().optional(),
   shortcut: z.string(),
   menuType: z.enum(systemMenu.menuType.enumValues),
   parentId: z.string().optional(),
