@@ -97,7 +97,7 @@ export function UpdateSheet({ menu, ...props }: UpdateSheetProps) {
 
 	return (
     <Sheet {...props}>
-      <SheetContent className="flex flex-col gap-6 sm:max-w-md">
+      <SheetContent className="flex flex-col gap-6 sm:max-w-md overflow-auto">
         <SheetHeader className="text-left">
           <SheetTitle>Update SystemMenu</SheetTitle>
           <SheetDescription>

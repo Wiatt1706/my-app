@@ -5,7 +5,6 @@ import { SidebarInset, SidebarMenuSkeleton, SidebarProvider } from "@/components
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { getNavMenus } from "./_lib/queries";
-import { DataTableSkeleton } from "@/components/ui/table/data-table-skeleton";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {

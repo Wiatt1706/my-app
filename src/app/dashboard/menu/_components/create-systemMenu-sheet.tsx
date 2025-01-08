@@ -29,7 +29,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { createSystemMenu } from "../_lib/actions";
 import {
   createSchema,
-	updateSchema,
 	type CreateDataSchema,
 } from "../_lib/validations";
 import { Input } from "@/components/ui/input";
@@ -77,7 +76,7 @@ export function CreateSheet({ ...props }) {
 
 	return (
     <Sheet {...props}>
-      <SheetContent className="flex flex-col gap-6 sm:max-w-md">
+      <SheetContent className="flex flex-col gap-6 sm:max-w-md overflow-auto">
         <SheetHeader className="text-left">
           <SheetTitle>Create SystemMenu</SheetTitle>
           <SheetDescription>
