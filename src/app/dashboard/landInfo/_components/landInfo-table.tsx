@@ -87,15 +87,15 @@ export function LandInfosTable({ promises }: LandInfoTableProps) {
       <UpdateSheet
         open={rowAction?.type === "update"}
         onOpenChange={() => setRowAction(null)}
-        land={rowAction?.row.original ?? null}
+        land={rowAction?.row?.original ?? null}
       />
 
       <DeleteLandInfosDialog
         open={rowAction?.type === "delete"}
         onOpenChange={() => setRowAction(null)}
-        lands={rowAction?.row.original ? [rowAction?.row.original] : []}
+        lands={rowAction?.row?.original ? [rowAction?.row.original] : []}
         showTrigger={false}
-        onSuccess={() => rowAction?.row.toggleSelected(false)}
+        onSuccess={() => rowAction?.row?.toggleSelected(false)}
       />
     </>
   );

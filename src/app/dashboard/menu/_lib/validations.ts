@@ -25,8 +25,14 @@ export const searchParamsCache = createSearchParamsCache({
 })
 
 export const createSchema = z.object({
+  icon: z.string(),
   title: z.string(),
   url: z.string(),
+  menuSort: z.number(),
+  isActive: z.boolean(),
+  shortcut: z.string(),
+  menuType: z.enum(systemMenu.menuType.enumValues),
+  parentId: z.string().optional(),
 })
 
 export const updateSchema = z.object({
@@ -35,6 +41,9 @@ export const updateSchema = z.object({
   url: z.string().optional(),
   menuSort: z.number().optional(),
   isActive: z.boolean().optional(),
+  menuType: z.enum(systemMenu.menuType.enumValues).optional(),
+  shortcut: z.string().optional(),
+  parentId: z.string().optional(),
 })
 
 export type GetDataSchema = Awaited<ReturnType<typeof searchParamsCache.parse>>

@@ -135,7 +135,7 @@ export function getColumns({
     {
       accessorKey: "isActive",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="是否打开" />
+        <DataTableColumnHeader column={column} title="默认打开" />
       ),
       cell: ({ row }) => (
         <Badge variant="outline">

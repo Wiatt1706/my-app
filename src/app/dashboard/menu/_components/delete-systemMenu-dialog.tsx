@@ -9,37 +9,37 @@ import { toast } from "sonner"
 import { useMediaQuery } from "@/hooks/use-media-query"
 import { Button } from "@/components/ui/button"
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
 } from "@/components/ui/dialog"
 import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
+	Drawer,
+	DrawerClose,
+	DrawerContent,
+	DrawerDescription,
+	DrawerFooter,
+	DrawerHeader,
+	DrawerTitle,
+	DrawerTrigger,
 } from "@/components/ui/drawer"
 
 import { deleteSystemMenus } from "../_lib/actions";
 
 interface DeleteDialogProps
   extends React.ComponentPropsWithoutRef<typeof Dialog> {
-  menus: Row<SystemMenu>["original"][];
+  rows: Row<SystemMenu>["original"][];
   showTrigger?: boolean;
   onSuccess?: () => void;
 }
 
 export function DeleteSystemMenusDialog({
-  menus,
+  rows,
   showTrigger = true,
   onSuccess,
   ...props
@@ -50,7 +50,7 @@ export function DeleteSystemMenusDialog({
   function onDelete() {
     startDeleteTransition(async () => {
       const { error } = await deleteSystemMenus({
-        ids: menus.map((menu) => menu.id),
+        ids: rows.map((row) => row.id),
       });
 
       if (error) {
@@ -71,7 +71,7 @@ export function DeleteSystemMenusDialog({
           <DialogTrigger asChild>
             <Button variant="outline" size="sm">
               <Trash className="mr-2 size-4" aria-hidden="true" />
-              Delete ({menus.length})
+              Delete ({rows.length})
             </Button>
           </DialogTrigger>
         ) : null}
@@ -80,8 +80,8 @@ export function DeleteSystemMenusDialog({
             <DialogTitle>Are you absolutely sure?</DialogTitle>
             <DialogDescription>
               This action cannot be undone. This will permanently delete your{" "}
-              <span className="font-medium">{menus.length}</span>
-              {menus.length === 1 ? " land" : " menus"} from our servers.
+              <span className="font-medium">{rows.length}</span>
+              {rows.length === 1 ? " row" : " rows"} from our servers.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:space-x-0">
@@ -114,7 +114,7 @@ export function DeleteSystemMenusDialog({
         <DrawerTrigger asChild>
           <Button variant="outline" size="sm">
             <Trash className="mr-2 size-4" aria-hidden="true" />
-            Delete ({menus.length})
+            Delete ({rows.length})
           </Button>
         </DrawerTrigger>
       ) : null}
@@ -123,8 +123,8 @@ export function DeleteSystemMenusDialog({
           <DrawerTitle>Are you absolutely sure?</DrawerTitle>
           <DrawerDescription>
             This action cannot be undone. This will permanently delete your{" "}
-            <span className="font-medium">{menus.length}</span>
-            {menus.length === 1 ? " land" : " menus"} from our servers.
+            <span className="font-medium">{rows.length}</span>
+            {rows.length === 1 ? " row" : " rows"} from our servers.
           </DrawerDescription>
         </DrawerHeader>
         <DrawerFooter className="gap-2 sm:space-x-0">

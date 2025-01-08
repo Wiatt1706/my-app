@@ -26,8 +26,11 @@ import {
 	SheetTitle,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
-import { updateSystemMenu } from "../_lib/actions";
-import { updateSchema, type UpdateDataSchema } from "../_lib/validations";
+import { createSystemMenu, updateSystemMenu } from "../_lib/actions";
+import {
+	updateSchema,
+	type CreateDataSchema,
+} from "../_lib/validations";
 import { Input } from "@/components/ui/input";
 import { Icons, RenderIcon } from "@/components/icons";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -36,60 +39,41 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getMenuTypeContent } from "../_lib/utils";
 import { Switch } from "@/components/ui/switch";
 
-interface UpdateSheetProps extends React.ComponentPropsWithRef<typeof Sheet> {
-	menu: SystemMenu | null;
-}
 
-export function UpdateSheet({ menu, ...props }: UpdateSheetProps) {
-	const [isUpdatePending, startUpdateTransition] = React.useTransition();
+
+export function CreateSheet({ ...props }) {
+	const [isPending, startTransition] = React.useTransition();
 	const [searchTerm, setSearchTerm] = React.useState<string>("");
 
-	const form = useForm<UpdateDataSchema>({
-    resolver: zodResolver(updateSchema),
-    defaultValues: {
-      icon: menu?.icon || "",
-      title: menu?.title,
-      url: menu?.url || "",
-      menuSort: menu?.menuSort || 0,
-      menuType: menu?.menuType || systemMenu.menuType.enumValues[0],
-      isActive: menu?.isActive || false
-    },
-  });
-
-	React.useEffect(() => {
-		if (menu) {
-			form.reset({
-        icon: menu.icon || "",
-        title: menu.title || "",
-        url: menu.url || "",
-        menuSort: menu.menuSort || 0,
-        menuType: menu.menuType || systemMenu.menuType.enumValues[0],
-        isActive: menu.isActive || false,
-      });
-		}
-	}, [menu, form]);
-
-	function onSubmit(input: UpdateDataSchema) {
-		startUpdateTransition(async () => {
-			if (!menu) return;
-
-			const { error } = await updateSystemMenu({
-				id: menu.id,
-				...input,
+		const form = useForm<CreateDataSchema>({
+			resolver: zodResolver(updateSchema),
+			defaultValues: {
+				icon: "",
+				title: "",
+				url: "",
+				menuSort: 0,
+			},
 			});
 
-			console.log("error", error);
 
-			if (error) {
-				toast.error(error);
-				return;
-			}
+	function onSubmit(input: CreateDataSchema) {
+		startTransition(async () => {
+      const { error } = await createSystemMenu({
+        ...input,
+      });
 
-			form.reset();
-			props.onOpenChange?.(false);
-			toast.success("Menu updated");
-		});
-	}
+      console.log("error", error);
+
+      if (error) {
+        toast.error(error);
+        return;
+      }
+
+      form.reset();
+      props.onOpenChange?.(false);
+      toast.success("Menu updated");
+    });
+		}
 
 	const filteredIcons = Object.keys(Icons).filter((iconKey) =>
 		iconKey.toLowerCase().includes(searchTerm.toLowerCase())
@@ -99,9 +83,9 @@ export function UpdateSheet({ menu, ...props }: UpdateSheetProps) {
     <Sheet {...props}>
       <SheetContent className="flex flex-col gap-6 sm:max-w-md">
         <SheetHeader className="text-left">
-          <SheetTitle>Update SystemMenu</SheetTitle>
+          <SheetTitle>Create SystemMenu</SheetTitle>
           <SheetDescription>
-            Update the systemMenu details and save the changes
+            Create the systemMenu details and save the changes
           </SheetDescription>
         </SheetHeader>
         <Form {...form}>
@@ -288,8 +272,8 @@ export function UpdateSheet({ menu, ...props }: UpdateSheetProps) {
                   Cancel
                 </Button>
               </SheetClose>
-              <Button disabled={isUpdatePending}>
-                {isUpdatePending && (
+              <Button disabled={isPending}>
+                {isPending && (
                   <Loader
                     className="mr-2 size-4 animate-spin"
                     aria-hidden="true"
