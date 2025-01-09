@@ -30,7 +30,7 @@ export const createSchema = z.object({
   url: z.string(),
   menuSort: z.number().optional(),
   isActive: z.boolean().optional(),
-  shortcut: z.string(),
+  shortcut: z.string().array().optional(),
   menuType: z.enum(systemMenu.menuType.enumValues),
   parentId: z.string().optional(),
 })
@@ -42,7 +42,7 @@ export const updateSchema = z.object({
   menuSort: z.number().optional(),
   isActive: z.boolean().optional(),
   menuType: z.enum(systemMenu.menuType.enumValues).optional(),
-  shortcut: z.string().optional(),
+  shortcut: z.string().array().optional(),
   parentId: z.string().optional(),
 })
 

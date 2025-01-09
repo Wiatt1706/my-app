@@ -32,11 +32,11 @@ const teams = [
   },
 ];
 
-interface LandInfoTableProps {
+interface AppSidebarProps {
   promises: Promise<[Awaited<ReturnType<typeof getNavMenus>>]>;
 }
 
-export default function AppSidebar({ promises }: LandInfoTableProps) {
+export default function AppSidebar({ promises }: AppSidebarProps) {
   const [{ data }] = React.use(promises);
 
   return (

@@ -144,6 +144,27 @@ export function getColumns({
       ),
     },
     {
+      accessorKey: "shortcut",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="快捷键" />
+      ),
+      cell: ({ row }) => (
+        <>
+          <div className="flex flex-wrap gap-2">
+            {row.original.shortcut?.map((value: string, index: number) => (
+              <Badge
+                key={index}
+                variant="outline"
+                className="flex items-center gap-1 px-3 py-2"
+              >
+                {value}
+              </Badge>
+            ))}
+          </div>
+        </>
+      ),
+    },
+    {
       accessorKey: "menuSort",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Sort" />

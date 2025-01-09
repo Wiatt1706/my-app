@@ -38,6 +38,8 @@ import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getMenuTypeContent } from "../_lib/utils";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { ShortcutField } from "./ShortcutsField";
 
 export function CreateSheet({ ...props }) {
 	const [isPending, startTransition] = React.useTransition();
@@ -172,7 +174,10 @@ export function CreateSheet({ ...props }) {
                 </FormItem>
               )}
             />
-
+            <FormField
+              name="shortcut"
+              render={({ field }) => <ShortcutField value={field.value} onChange={field.onChange} />}
+            />
             <FormField
               control={form.control}
               name="icon"
@@ -267,7 +272,7 @@ export function CreateSheet({ ...props }) {
                   Cancel
                 </Button>
               </SheetClose>
-              <Button disabled={isPending}>
+              <Button disabled={isPending} type="submit">
                 {isPending && (
                   <Loader
                     className="mr-2 size-4 animate-spin"

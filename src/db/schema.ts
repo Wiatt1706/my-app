@@ -377,7 +377,7 @@ export const systemMenu = pgTable("system_menu", {
 	title: varchar().notNull(),
 	url: varchar(),
 	icon: varchar(),
-	shortcut: jsonb(),
+  shortcut: varchar().array(),
 	isActive: boolean("is_active").default(false).notNull(),
 	parentId: uuid("parent_id"),
   menuType: varchar("menu_type", {

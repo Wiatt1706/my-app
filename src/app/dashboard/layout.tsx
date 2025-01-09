@@ -26,7 +26,7 @@ export default async function DashboardLayout({
   ]);
 
   return (
-    <KBar>
+    <KBar promises={promises}>
       <SidebarProvider defaultOpen={defaultOpen}>
         <Suspense fallback={<SidebarMenuSkeleton showIcon={true} />}>
           <AppSidebar promises={promises} />
