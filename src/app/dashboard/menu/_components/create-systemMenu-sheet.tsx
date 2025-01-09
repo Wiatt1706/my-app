@@ -8,53 +8,75 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
-	Form,
-	FormControl,
-	FormDescription,
-	FormField,
-	FormItem,
-	FormLabel,
-	FormMessage,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import {
-	Sheet,
-	SheetClose,
-	SheetContent,
-	SheetDescription,
-	SheetFooter,
-	SheetHeader,
-	SheetTitle,
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { createSystemMenu } from "../_lib/actions";
-import {
-  createSchema,
-	type CreateDataSchema,
-} from "../_lib/validations";
+import { createSchema, type CreateDataSchema } from "../_lib/validations";
 import { Input } from "@/components/ui/input";
 import { Icons, RenderIcon } from "@/components/icons";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { getMenuTypeContent } from "../_lib/utils";
 import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
-import { ShortcutField } from "./ShortcutsField";
+import { ShortcutField } from "../../../../components/shortcuts-field";
+import { SelectTableSheet } from "./menu-select-table";
+import { DataTableRowAction } from "@/types";
 
-export function CreateSheet({ ...props }) {
-	const [isPending, startTransition] = React.useTransition();
-	const [searchTerm, setSearchTerm] = React.useState<string>("");
+interface CreateSheetProps extends React.ComponentPropsWithRef<typeof Sheet> {
+  datas: {
+    data: SystemMenu[];
+    pageCount: number;
+  } | null;
+}
 
-		const form = useForm<CreateDataSchema>({
-      resolver: zodResolver(createSchema),
-      defaultValues: {
-        menuSort: 0,
-      },
-    });
+export function CreateSheet({ datas, ...props }: CreateSheetProps) {
+  const [isPending, startTransition] = React.useTransition();
+  const [searchTerm, setSearchTerm] = React.useState<string>("");
+  const [rowAction, setRowAction] =
+    React.useState<DataTableRowAction<SystemMenu> | null>(null);
 
+  const form = useForm<CreateDataSchema>({
+    resolver: zodResolver(createSchema),
+    defaultValues: {
+      icon: "",
+      url: "",
+      menuSort: 0,
+      menuType: systemMenu.menuType.enumValues[0],
+      isActive: false,
+      shortcut: [],
+      parentId: "",
+    },
+  });
 
-	function onSubmit(input: CreateDataSchema) {
-		startTransition(async () => {
+  function onSubmit(input: CreateDataSchema) {
+    startTransition(async () => {
       const { error } = await createSystemMenu({
         ...input,
       });
@@ -70,15 +92,15 @@ export function CreateSheet({ ...props }) {
       props.onOpenChange?.(false);
       toast.success("Menu updated");
     });
-		}
+  }
 
-	const filteredIcons = Object.keys(Icons).filter((iconKey) =>
-		iconKey.toLowerCase().includes(searchTerm.toLowerCase())
-	);
+  const filteredIcons = Object.keys(Icons).filter((iconKey) =>
+    iconKey.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-	return (
+  return (
     <Sheet {...props}>
-      <SheetContent className="flex flex-col gap-6 sm:max-w-md overflow-auto">
+      <SheetContent className="flex flex-col w-full gap-6 sm:max-w-md overflow-auto">
         <SheetHeader className="text-left">
           <SheetTitle>Create SystemMenu</SheetTitle>
           <SheetDescription>
@@ -176,7 +198,38 @@ export function CreateSheet({ ...props }) {
             />
             <FormField
               name="shortcut"
-              render={({ field }) => <ShortcutField value={field.value} onChange={field.onChange} />}
+              render={({ field }) => (
+                <ShortcutField value={field.value} onChange={field.onChange} />
+              )}
+            />
+            <FormField
+              name="parentId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>父级</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="父级id"
+                      value={field.value} // 受控输入
+                      readOnly
+                      onClick={() => {
+                        setRowAction({ type: "select" });
+                      }}
+                      className="cursor-pointer"
+                    />
+                  </FormControl>
+                  <SelectTableSheet
+                    open={rowAction?.type === "select"}
+                    onOpenChange={() => setRowAction(null)}
+                    data={datas?.data || []}
+                    pageCount={datas?.pageCount || 0}
+                    onRowSelect={(selectedRow) => {
+                      field.onChange(selectedRow?.id);
+                    }}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
             />
             <FormField
               control={form.control}
@@ -266,6 +319,7 @@ export function CreateSheet({ ...props }) {
                 </FormItem>
               )}
             />
+
             <SheetFooter className="gap-2 pt-2 sm:space-x-0">
               <SheetClose asChild>
                 <Button type="button" variant="outline">

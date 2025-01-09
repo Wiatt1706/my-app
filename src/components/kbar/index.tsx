@@ -10,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import React, { useMemo } from 'react';
 import RenderResults from './render-result';
 import useThemeSwitching from './use-theme-switching';
-import { getNavMenus } from '@/app/dashboard/_lib/queries';
+import { SystemMenuWithChildren, getNavMenus } from '@/app/dashboard/_lib/queries';
 import { RenderIcon } from '../icons';
 
 
@@ -30,7 +30,7 @@ export default function KBar({ promises, children }: KBarProps) {
 	// These action are for the navigation
 	const actions = useMemo(
     () =>
-      navItems.flatMap((navItem) => {
+      navItems.flatMap((navItem: SystemMenuWithChildren) => {
         // Only include base action if the navItem has a real URL and is not just a container
         const baseAction =
           navItem.url !== "#"

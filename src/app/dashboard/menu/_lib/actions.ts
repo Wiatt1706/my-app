@@ -21,6 +21,7 @@ export async function createSystemMenu(input: CreateDataSchema) {
 					isActive: input.isActive, // 使用驼峰命名
 					menuType: input.menuType,
 					menuSort: input.menuSort,
+					parentId: input.parentId,
 				});
 		});
 
@@ -52,7 +53,8 @@ export async function updateSystemMenu(input: UpdateDataSchema & { id: string })
 				isActive: input.isActive,
 				icon: input.icon,
 				shortcut: input.shortcut,
-				menuType: input.menuType
+				menuType: input.menuType,
+				parentId: input.parentId,
 			})
 			.where(eq(systemMenu.id, input.id))
 

@@ -19,22 +19,8 @@ import { getExpandedRowModel } from "@tanstack/react-table";
 import { CreateSheet } from "./create-systemMenu-sheet";
 import { getMenuTypeContent } from "../_lib/utils";
 
-interface TableProps {
-  promises: Promise<[Awaited<ReturnType<typeof getSystemMenusWithChildren>>]>;
-}
-
-export function MenuTable({ promises }: TableProps) {
-  const [{ data, pageCount }] = React.use(promises);
-
-  const [rowAction, setRowAction] =
-    React.useState<DataTableRowAction<SystemMenu> | null>(null);
-
-  const columns = React.useMemo(
-    () => getColumns({ setRowAction }),
-    [setRowAction]
-  );
-
-  const advancedFilterFields: DataTableAdvancedFilterField<SystemMenu>[] = [
+export const MenuTableFilterFields: DataTableAdvancedFilterField<SystemMenu>[] =
+  [
     {
       id: "title",
       label: "title",
@@ -71,6 +57,21 @@ export function MenuTable({ promises }: TableProps) {
     },
   ];
 
+interface TableProps {
+  promises: Promise<[Awaited<ReturnType<typeof getSystemMenusWithChildren>>]>;
+}
+
+export function MenuTable({ promises }: TableProps) {
+  const [{ data, pageCount }] = React.use(promises);
+
+  const [rowAction, setRowAction] =
+    React.useState<DataTableRowAction<SystemMenu> | null>(null);
+
+  const columns = React.useMemo(
+    () => getColumns({ setRowAction, multiple: false }),
+    [setRowAction]
+  );
+
   const { table } = useDataTable({
     data,
     columns,
@@ -99,7 +100,7 @@ export function MenuTable({ promises }: TableProps) {
       >
         <DataTableAdvancedToolbar
           table={table}
-          filterFields={advancedFilterFields}
+          filterFields={MenuTableFilterFields}
           shallow={false}
         >
           <SystemMenuTableToolbarActions
@@ -112,12 +113,14 @@ export function MenuTable({ promises }: TableProps) {
       <CreateSheet
         open={rowAction?.type === "create"}
         onOpenChange={() => setRowAction(null)}
+        datas={{ data: data ?? [], pageCount: pageCount ?? 0 }}
       />
 
       <UpdateSheet
         open={rowAction?.type === "update"}
         onOpenChange={() => setRowAction(null)}
         menu={rowAction?.row?.original ?? null}
+        datas={{ data: data ?? [], pageCount: pageCount ?? 0 }}
       />
 
       <DeleteSystemMenusDialog

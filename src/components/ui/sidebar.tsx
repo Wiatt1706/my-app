@@ -325,7 +325,7 @@ const SidebarInset = React.forwardRef<
     ? "max-w-full" // 如果是移动设备，占满宽度
     : state === "expanded"
     ? "max-w-[calc(100%-var(--sidebar-width))]" // 桌面端并且 sidebar 打开时
-    : "max-w-full"; // 桌面端并且 sidebar 关闭时，占满宽度
+    : "max-w-[calc(100%-var(--sidebar-width-icon))]"; // 桌面端并且 sidebar 关闭时，占满宽度
 
   return (
     <main

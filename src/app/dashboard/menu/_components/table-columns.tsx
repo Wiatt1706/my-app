@@ -29,38 +29,48 @@ import { getMenuTypeContent } from "../_lib/utils";
 import { toast } from "sonner";
 import { updateSystemMenu } from "../_lib/actions";
 import { getErrorMessage } from "@/lib/handle-error";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface GetColumnsProps {
   setRowAction: React.Dispatch<
     React.SetStateAction<DataTableRowAction<SystemMenu> | null>
   >;
+  multiple: boolean;
 }
 
 export function getColumns({
   setRowAction,
+  multiple,
 }: GetColumnsProps): ColumnDef<SystemMenu>[] {
   return [
     {
-      accessorKey: "title",
+      id: "select",
+      accessorKey: "select",
       header: ({ column, table }) => (
         <div className="flex items-center gap-2">
-          <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) =>
-              table.toggleAllPageRowsSelected(!!value)
-            }
-            aria-label="Select all"
-            className="mx-1"
-          />
+          {multiple && (
+            <Checkbox
+              checked={
+                table.getIsAllPageRowsSelected() ||
+                (table.getIsSomePageRowsSelected() && "indeterminate")
+              }
+              onCheckedChange={(value) =>
+                table.toggleAllPageRowsSelected(!!value)
+              }
+              aria-label="Select all"
+              className="mx-1"
+            />
+          )}
           <button
             {...{
               onClick: table.getToggleAllRowsExpandedHandler(),
             }}
             className="p-1 rounded transition-transform duration-200 
-							  focus:outline-none focus:ring-2 focus:ring-blue-500 "
+						  focus:outline-none focus:ring-2 focus:ring-blue-500 "
             aria-label="Toggle expand"
           >
             <ChevronRight
@@ -72,15 +82,14 @@ export function getColumns({
           <DataTableColumnHeader column={column} title="title" />
         </div>
       ),
-      cell: ({ row }) => {
-        const iconKey = row.original.icon as string | undefined;
-        return (
-          <div
-            style={{
-              paddingLeft: `${row.depth * 2}rem`,
-            }}
-          >
-            <div className="flex items-center gap-2">
+      cell: ({ row }) => (
+        <div
+          style={{
+            paddingLeft: `${row.depth * 2}rem`,
+          }}
+        >
+          <div className="flex items-center gap-2">
+            {multiple && (
               <Checkbox
                 checked={
                   row.getIsSelected() ||
@@ -90,36 +99,53 @@ export function getColumns({
                 aria-label="Select row"
                 className="mx-1"
               />
-              {row.getCanExpand() ? (
-                <button
-                  onClick={row.getToggleExpandedHandler()}
-                  className="p-1 rounded transition-transform duration-200 
+            )}
+            {row.getCanExpand() ? (
+              <button
+                onClick={row.getToggleExpandedHandler()}
+                className="p-1 rounded transition-transform duration-200 
 								  focus:outline-none focus:ring-2 focus:ring-blue-500 "
-                  aria-label="Toggle expand"
-                >
-                  <ChevronRight
-                    className={`w-4 h-4 transition-transform duration-200 ${
-                      row.getIsExpanded() ? "rotate-90" : ""
-                    }`}
-                  />
-                </button>
-              ) : (
-                <span className=""></span> // 空白占位符
-              )}
-              {RenderIcon(iconKey)}
-              <span>{row.getValue("title")}</span>
-            </div>
+                aria-label="Toggle expand"
+              >
+                <ChevronRight
+                  className={`w-4 h-4 transition-transform duration-200 ${
+                    row.getIsExpanded() ? "rotate-90" : ""
+                  }`}
+                />
+              </button>
+            ) : (
+              <span className=""></span> // 空白占位符
+            )}
+            <Button
+              onClick={() => setRowAction({ row, type: "select" })}
+              variant="link"
+            >
+              {RenderIcon(row.original.icon as string | undefined)}
+              <span>{row.original.title}</span>
+            </Button>
           </div>
-        );
-      },
+        </div>
+      ),
       footer: (props) => props.column.id,
     },
     {
       accessorKey: "url",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="url" />
+        <DataTableColumnHeader column={column} title="URL" />
       ),
-      cell: ({ row }) => <div className="w-20">{row.getValue("url")}</div>,
+      cell: ({ row }) => {
+        const urlValue = row.getValue("url") as string;
+        return (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="w-40 truncate cursor-pointer">{urlValue}</div>
+            </TooltipTrigger>
+            <TooltipContent className="border bg-accent font-semibold text-foreground dark:bg-zinc-900 max-w-xs">
+              <p>{urlValue}</p>
+            </TooltipContent>
+          </Tooltip>
+        );
+      },
     },
     {
       accessorKey: "menuType",
