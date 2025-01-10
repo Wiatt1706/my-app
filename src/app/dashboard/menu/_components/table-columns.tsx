@@ -119,6 +119,7 @@ export function getColumns({
             <Button
               onClick={() => setRowAction({ row, type: "select" })}
               variant="link"
+              className="pl-0"
             >
               {RenderIcon(row.original.icon as string | undefined)}
               <span>{row.original.title}</span>

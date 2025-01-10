@@ -72,8 +72,8 @@ export function UpdateSheet({ menu, datas, ...props }: UpdateSheetProps) {
       menuSort: menu?.menuSort || 0,
       menuType: menu?.menuType || systemMenu.menuType.enumValues[0],
       isActive: menu?.isActive || false,
-	  shortcut: menu?.shortcut || [],
-	  parentId: menu?.parentId || "",
+	    shortcut: menu?.shortcut || [],
+	    parentId: menu?.parentId || "",
     },
   });
 
@@ -199,6 +199,35 @@ export function UpdateSheet({ menu, datas, ...props }: UpdateSheetProps) {
               )}
             />
             <FormField
+              name="parentId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>父级</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="选择父菜单"
+                      value={field.value} // 受控输入
+                      readOnly
+                      onClick={() => {
+                        setRowAction({ type: "select" });
+                      }}
+                      className="cursor-pointer"
+                    />
+                  </FormControl>
+                  <SelectTableSheet
+                    open={rowAction?.type === "select"}
+                    onOpenChange={() => setRowAction(null)}
+                    data={datas?.data || []}
+                    pageCount={datas?.pageCount || 0}
+                    onRowSelect={(selectedRow) => {
+                      field.onChange(selectedRow?.id);
+                    }}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
               control={form.control}
               name="menuSort"
               render={({ field }) => (
@@ -216,41 +245,7 @@ export function UpdateSheet({ menu, datas, ...props }: UpdateSheetProps) {
                 </FormItem>
               )}
             />
-            <FormField
-              name="shortcut"
-              render={({ field }) => (
-                <ShortcutField value={field.value} onChange={field.onChange} />
-              )}
-            />
-            <FormField
-              name="parentId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>父级</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="父级id"
-                      value={field.value} // 受控输入
-                      readOnly
-                      onClick={() => {
-                        setRowAction({ type: "select" });
-                      }}
-					  className="cursor-pointer"
-                    />
-                  </FormControl>
-                  <SelectTableSheet
-                    open={rowAction?.type === "select"}
-                    onOpenChange={() => setRowAction(null)}
-                    data={datas?.data || []}
-                    pageCount={datas?.pageCount || 0}
-                    onRowSelect={(selectedRow) => {
-					  field.onChange(selectedRow?.id);
-                    }}
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+
             <FormField
               control={form.control}
               name="icon"
@@ -337,6 +332,12 @@ export function UpdateSheet({ menu, datas, ...props }: UpdateSheetProps) {
                     />
                   </FormControl>
                 </FormItem>
+              )}
+            />
+            <FormField
+              name="shortcut"
+              render={({ field }) => (
+                <ShortcutField value={field.value} onChange={field.onChange} />
               )}
             />
 

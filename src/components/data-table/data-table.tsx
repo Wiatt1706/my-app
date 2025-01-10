@@ -51,7 +51,7 @@ export function DataTable<TData>({
   return (
     <div
       className={cn(
-        "relative w-full overflow-auto space-y-2.5 px-4",
+        "relative w-full overflow-auto space-y-2.5",
         className
       )}
       {...props}

@@ -44,17 +44,22 @@ export async function createSystemMenu(input: CreateDataSchema) {
 export async function updateSystemMenu(input: UpdateDataSchema & { id: string }) {
 	unstable_noStore()
 	try {
+		const sanitizedInput = {
+			...input,
+			parentId: input.parentId || null,
+		};
+		
 		const data = await db
 			.update(systemMenu)
 			.set({
-				title: input.title,
-				url: input.url,
-				menuSort: input.menuSort,
-				isActive: input.isActive,
-				icon: input.icon,
-				shortcut: input.shortcut,
-				menuType: input.menuType,
-				parentId: input.parentId,
+				title: sanitizedInput.title,
+				url: sanitizedInput.url,
+				menuSort: sanitizedInput.menuSort,
+				isActive: sanitizedInput.isActive,
+				icon: sanitizedInput.icon,
+				shortcut: sanitizedInput.shortcut,
+				menuType: sanitizedInput.menuType,
+				parentId: sanitizedInput.parentId,
 			})
 			.where(eq(systemMenu.id, input.id))
 

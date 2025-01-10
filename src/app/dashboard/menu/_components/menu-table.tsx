@@ -68,7 +68,7 @@ export function MenuTable({ promises }: TableProps) {
     React.useState<DataTableRowAction<SystemMenu> | null>(null);
 
   const columns = React.useMemo(
-    () => getColumns({ setRowAction, multiple: false }),
+    () => getColumns({ setRowAction, multiple: true }),
     [setRowAction]
   );
 
@@ -79,7 +79,7 @@ export function MenuTable({ promises }: TableProps) {
     enableAdvancedFilter: true,
     initialState: {
       sorting: [{ id: "createdAt", desc: true }],
-      columnPinning: { right: ["actions"], left: ["title"] },
+      columnPinning: { right: ["actions"], left: ["select"] },
     },
     getRowId: (originalRow) => originalRow.id,
     shallow: false,
@@ -94,7 +94,7 @@ export function MenuTable({ promises }: TableProps) {
   return (
     <>
       <DataTable
-        className="h-[calc(100vh-48px)]"
+        className="h-[calc(100vh-48px)] px-4"
         table={table}
         floatingBar={<TableFloatingBar table={table} />}
       >
@@ -117,7 +117,7 @@ export function MenuTable({ promises }: TableProps) {
       />
 
       <UpdateSheet
-        open={rowAction?.type === "update"}
+        open={rowAction?.type === "update" || rowAction?.type === "select"}
         onOpenChange={() => setRowAction(null)}
         menu={rowAction?.row?.original ?? null}
         datas={{ data: data ?? [], pageCount: pageCount ?? 0 }}
