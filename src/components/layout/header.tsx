@@ -21,6 +21,7 @@ export default function Header() {
         </div>
         <UserNav />
         <ThemeToggle />
+        <SidebarTrigger className="-mr-1 ml-auto rotate-180" />
       </div>
     </header>
   );
