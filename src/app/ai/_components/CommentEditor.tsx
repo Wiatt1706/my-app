@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import React, { useState } from "react";
 
@@ -29,7 +30,7 @@ export const CommentEditor: React.FC<CommentEditorProps> = ({
         <div className="grid gap-4">
           {/* Textarea for comment input */}
           <Textarea
-            className=" p-4 text-sm"
+            className=" p-4 text-sm max-h-60"
             placeholder={placeholder}
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -38,18 +39,15 @@ export const CommentEditor: React.FC<CommentEditorProps> = ({
 
           {/* Controls: Switch and Send Button */}
           <div className="flex items-center">
-            <label
-              htmlFor="mute"
-              className="flex items-center gap-2 text-xs font-normal text-gray-600"
-            >
-              <input
-                type="checkbox"
-                id="mute"
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded "
-                aria-label="Mute thread"
-              />
-              Mute this thread
-            </label>
+            <div className="flex items-center space-x-2">
+              <Checkbox id="terms" />
+              <label
+                htmlFor="terms"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Mute this thread
+              </label>
+            </div>
 
             <Button
               type="submit"

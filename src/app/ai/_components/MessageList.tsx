@@ -7,10 +7,10 @@ type Props = {
 
 export const MessageList: React.FC<Props> = ({ messages }) => {
   return (
-    <>
+    <div className="p-4 max-w-full">
       {messages.map((message, index) => (
         <MessageItem key={index} message={message} />
       ))}
-    </>
+    </div>
   );
 };

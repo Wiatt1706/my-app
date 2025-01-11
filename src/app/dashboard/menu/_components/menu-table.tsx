@@ -18,6 +18,7 @@ import { TableFloatingBar } from "./table-floating-bar";
 import { getExpandedRowModel } from "@tanstack/react-table";
 import { CreateSheet } from "./create-systemMenu-sheet";
 import { getMenuTypeContent } from "../_lib/utils";
+import { useDashboard } from "@/hooks/useDashboard";
 
 export const MenuTableFilterFields: DataTableAdvancedFilterField<SystemMenu>[] =
   [
@@ -90,6 +91,31 @@ export function MenuTable({ promises }: TableProps) {
     getRowCanExpand: (row) =>
       !!(row.original as SystemMenuWithChildren).children?.length,
   });
+
+
+   const { state, dispatch } = useDashboard();
+
+   React.useEffect(() => {
+     // 设置页面信息
+     dispatch({
+       type: "SET_PAGE_INFO",
+       payload: {
+         route: "/menu",
+         pageId: "menuTable",
+         description: "Manage system menus.",
+       },
+     });
+
+     // 设置初始表格数据
+     dispatch({
+       type: "SET_TABLE_DATA",
+       payload: {
+         data: data,
+       },
+     });
+   }, [dispatch]);
+
+
 
   return (
     <>

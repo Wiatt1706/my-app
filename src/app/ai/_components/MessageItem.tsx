@@ -14,10 +14,10 @@ export const MessageItem: React.FC<Props> = ({ message }) => {
       className={`mb-4 ${message.role === "user" ? "text-right" : "text-left"}`}
     >
       <div
-        className={`inline-block p-2 rounded-lg overflow-hidden max-w-full ${
+        className={`inline-block p-2 rounded-lg overflow-hidden max-w-full bg-secondary text-secondary-foreground text-sm space-y-4 break-words space-x-2 ${
           message.role === "user"
-            ? "bg-[#18181b] text-primary-foreground"
-            : "bg-[#f4f4f5] text-[#18181b] text-sm space-y-4 break-words space-x-2"
+            ? ""
+            : ""
         }`}
       >
         <ReactMarkdown

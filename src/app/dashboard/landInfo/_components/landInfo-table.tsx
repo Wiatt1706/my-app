@@ -6,12 +6,17 @@ import type { DataTableFilterField, DataTableRowAction } from "@/types";
 import { useDataTable } from "@/hooks/use-data-table";
 import { DataTable } from "@/components/data-table/data-table";
 import { DataTableToolbar } from "@/components/data-table/data-table-toolbar";
-import type { getLandInfos, getLandStatsCounts, getLandTypeCounts } from "../_lib/queries";
+import type {
+  getLandInfos,
+  getLandStatsCounts,
+  getLandTypeCounts,
+} from "../_lib/queries";
 import { getStatusContent, getTypeContent } from "../_lib/utils";
 import { DeleteLandInfosDialog } from "./delete-landInfo-dialog";
 import { getColumns } from "./table-columns";
 import { LandInfoTableToolbarActions } from "./table-toolbar-actions";
 import { UpdateSheet } from "./update-landInfo-sheet";
+import { useDashboard } from "@/hooks/useDashboard";
 
 interface LandInfoTableProps {
   promises: Promise<
@@ -75,6 +80,28 @@ export function LandInfosTable({ promises }: LandInfoTableProps) {
     shallow: false,
     clearOnDefault: true,
   });
+
+  const { state, dispatch } = useDashboard();
+
+  React.useEffect(() => {
+    // 设置页面信息
+    dispatch({
+      type: "SET_PAGE_INFO",
+      payload: {
+        route: "/landInfo",
+        pageId: "landInfoTable",
+        description: "Manage system landInfo.",
+      },
+    });
+
+    // 设置初始表格数据
+    dispatch({
+      type: "SET_TABLE_DATA",
+      payload: {
+        data: data,
+      },
+    });
+  }, [dispatch]);
 
   return (
     <>
