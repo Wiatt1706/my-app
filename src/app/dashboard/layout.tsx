@@ -7,6 +7,8 @@ import { getNavMenus } from "./_lib/queries";
 import { Suspense } from "react";
 import SidebarLeft from "@/components/layout/sidebar-left";
 import { SidebarRight } from "@/components/layout/sidebar-right";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import ChatPage from "../ai/page";
 
 export const metadata: Metadata = {
   title: "Next Shadcn Dashboard Starter",
@@ -34,12 +36,50 @@ export default async function DashboardLayout({
         </Suspense>
         <SidebarInset>
           <Header />
-          {/* page main content */}
-          {children}
-          {/* page main content ends */}
+          <ResizablePanelGroup direction="horizontal">
+            <ResizablePanel defaultSize={75}>
+              {/* page main content */}
+              {children}
+              {/* page main content ends */}
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={25} maxSize={50}>
+              <ChatPage />
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </SidebarInset>
-        <SidebarRight />
+        
+        
       </SidebarProvider>
     </KBar>
   );
 }
+
+//  <SidebarInset>
+//    <Header />
+//    <ResizablePanelGroup direction="horizontal">
+//      <ResizablePanel defaultSize={75}>
+//        {/* page main content */}
+//        {children}
+//        {/* page main content ends */}
+//      </ResizablePanel>
+//      <ResizableHandle withHandle />
+//      <ResizablePanel defaultSize={25} maxSize={50}>
+//        <ChatPage />
+//      </ResizablePanel>
+//    </ResizablePanelGroup>
+//  </SidebarInset>;
+
+{/* <ResizablePanelGroup direction="horizontal">
+  <ResizablePanel defaultSize={75}>
+    <SidebarInset>
+      <Header />
+      {children}
+    </SidebarInset>
+  </ResizablePanel>
+  <ResizableHandle withHandle />
+
+  <ResizablePanel defaultSize={25} maxSize={50}>
+    <ChatPage />
+  </ResizablePanel>
+</ResizablePanelGroup>; */}
