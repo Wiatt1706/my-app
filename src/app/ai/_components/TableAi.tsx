@@ -57,7 +57,6 @@ export function TableAi() {
       resizeObserver.observe(bottomRef.current);
     }
 
-    // Initial calculation
     updateHeight();
 
     return () => {
