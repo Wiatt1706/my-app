@@ -14,7 +14,7 @@ export function TableAi() {
   const { state } = useDashboard();
 
   console.log("state", state);
-  
+
   const executeAction = async (
     actionName: string,
     params: Record<string, any>
@@ -36,6 +36,16 @@ export function TableAi() {
 
   const headToolRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
     const updateHeight = () => {
@@ -69,19 +79,20 @@ export function TableAi() {
       <div ref={headToolRef}>
         <HeadTool />
       </div>
-      {state.pageInfo && (
+      {/* {state.pageInfo && (
         <div className="p-4">
           <p className="text-sm text-muted-foreground">
             {JSON.stringify(state.pageInfo)}
           </p>
         </div>
-      )}
-      <ScrollArea
+      )} */}
+      <div
         style={{ maxHeight: scrollAreaHeight, width: "100%" }}
-        className="w-full overflow-auto"
+        className="w-full overflow-auto "
       >
         <MessageList messages={messages} />
-      </ScrollArea>
+        <div ref={messagesEndRef} />
+      </div>
       <div ref={bottomRef} className="absolute bottom-0 w-full bg-background">
         <Separator className="mt-auto" />
         <CommentEditorWrapper
