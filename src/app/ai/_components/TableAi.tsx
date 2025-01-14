@@ -13,8 +13,6 @@ import { useDashboard } from "@/hooks/useDashboard";
 export function TableAi() {
   const { state } = useDashboard();
 
-  console.log("state", state);
-
   const executeAction = async (
     actionName: string,
     params: Record<string, any>
@@ -99,6 +97,7 @@ export function TableAi() {
           messages={messages}
           setMessages={setMessages}
           setIsLoading={setIsLoading}
+          initialConfig={{ systemPrompt: JSON.stringify(state.pageInfo) }}
         />
       </div>
     </div>
