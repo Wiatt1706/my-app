@@ -13,6 +13,8 @@ import { useDashboard } from "@/hooks/useDashboard";
 export function TableAi() {
   const { state } = useDashboard();
 
+  console.log("state:", state.actions.availableActions);
+  
   const executeAction = async (
     actionName: string,
     params: Record<string, any>
@@ -77,13 +79,6 @@ export function TableAi() {
       <div ref={headToolRef}>
         <HeadTool />
       </div>
-      {/* {state.pageInfo && (
-        <div className="p-4">
-          <p className="text-sm text-muted-foreground">
-            {JSON.stringify(state.pageInfo)}
-          </p>
-        </div>
-      )} */}
       <div
         style={{ maxHeight: scrollAreaHeight, width: "100%" }}
         className="w-full overflow-auto "

@@ -33,17 +33,6 @@ const functionDeclarationsTool: FunctionDeclarationsTool = {
 
 const tools: Tool[] = [functionDeclarationsTool];
 
-async function controlLight(args: {
-  brightness: number;
-  colorTemperature: string;
-}) {
-  // 在此处实现控制灯光的逻辑
-  // 例如，调用实际的硬件 API 或服务
-  return {
-    success: true,
-    message: `灯光已设置为亮度：${args.brightness}，色温：${args.colorTemperature}。`,
-  };
-}
 
 const model = genAI.getGenerativeModel({
   model: "gemini-1.5-flash",

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AiMessage } from "../_lib/chatApi";
 import { CommentEditor } from "./CommentEditor";
 import {
@@ -6,11 +6,143 @@ import {
   GoogleGenerativeAI,
   SchemaType,
 } from "@google/generative-ai";
-import { useDashboard } from "@/hooks/useDashboard";
-import { generateFunctionDeclarations, useFunctionsFromActions } from "./ai-util";
 
 const key = process.env.NEXT_PUBLIC_GEMINI_API;
 const genAI = new GoogleGenerativeAI(key!);
+
+const functions: Record<string, (args: any) => Promise<any>> = {
+  controlLight: async ({ brightness, colorTemperature }) => {
+    console.log("Setting light:", brightness, colorTemperature);
+    return { brightness, colorTemperature };
+  },
+  adjustThermostat: async ({ temperature, mode }) => {
+    console.log("Adjusting thermostat:", temperature, mode);
+    return { temperature, mode };
+  },
+  playMusic: async ({ trackName, volume }) => {
+    console.log("Playing music:", trackName, volume);
+    return { trackName, volume };
+  },
+  openWindow: async ({ action, percentage }) => {
+    console.log("Window action:", action, percentage);
+    return { action, percentage: action === "open" ? percentage : 0 };
+  },
+  setAlarm: async ({ time, label, repeat }) => {
+    console.log("Setting alarm:", time, label, repeat);
+    return { time, label, repeat };
+  },
+};
+
+const functionDeclarationsTool = {
+  functionDeclarations: [
+    {
+      name: "controlLight",
+      description: "设置房间灯光的亮度和色温。",
+      parameters: {
+        type: SchemaType.OBJECT,
+        properties: {
+          brightness: {
+            type: SchemaType.INTEGER,
+            description:
+              "亮度级别，范围从 0 到 100。0 表示关闭，100 表示全亮度。",
+          },
+          colorTemperature: {
+            type: SchemaType.STRING,
+            enum: ["daylight", "cool", "warm"],
+            description: "灯光的色温，可以是 'daylight'、'cool' 或 'warm'。",
+          },
+        },
+        required: ["brightness", "colorTemperature"],
+      },
+    },
+    {
+      name: "adjustThermostat",
+      description: "设置房间的温度。",
+      parameters: {
+        type: SchemaType.OBJECT,
+        properties: {
+          temperature: {
+            type: SchemaType.INTEGER,
+            description: "温度设置，单位为摄氏度（°C）。",
+          },
+          mode: {
+            type: SchemaType.STRING,
+            enum: ["cooling", "heating", "auto"],
+            description:
+              "温控模式：制冷（cooling）、制热（heating）或自动（auto）。",
+          },
+        },
+        required: ["temperature", "mode"],
+      },
+    },
+    {
+      name: "playMusic",
+      description: "播放音乐。",
+      parameters: {
+        type: SchemaType.OBJECT,
+        properties: {
+          trackName: {
+            type: SchemaType.STRING,
+            description: "要播放的曲目名称。",
+          },
+          volume: {
+            type: SchemaType.INTEGER,
+            description: "音量级别，范围从 0 到 100。",
+          },
+        },
+        required: ["trackName", "volume"],
+      },
+    },
+    {
+      name: "openWindow",
+      description: "控制房间的窗户状态。",
+      parameters: {
+        type: SchemaType.OBJECT,
+        properties: {
+          action: {
+            type: SchemaType.STRING,
+            enum: ["open", "close"],
+            description: "窗户操作：打开（open）或关闭（close）。",
+          },
+          percentage: {
+            type: SchemaType.INTEGER,
+            description:
+              "打开窗户的百分比（0 到 100）。仅当 action 为 open 时有效。",
+          },
+        },
+        required: ["action"],
+      },
+    },
+    {
+      name: "setAlarm",
+      description: "设置闹钟。",
+      parameters: {
+        type: SchemaType.OBJECT,
+        properties: {
+          time: {
+            type: SchemaType.STRING,
+            description: "闹钟时间，格式为 HH:mm。",
+          },
+          label: {
+            type: SchemaType.STRING,
+            description: "闹钟标签，例如 '早起'。",
+          },
+          repeat: {
+            type: SchemaType.BOOLEAN,
+            description: "是否重复闹钟。",
+          },
+        },
+        required: ["time"],
+      },
+    },
+  ],
+} as FunctionDeclarationsTool;
+
+const tools = [functionDeclarationsTool];
+const model = genAI.getGenerativeModel({
+  model: "gemini-1.5-flash",
+  tools: tools,
+});
 
 type InitialConfig = {
   systemPrompt?: string;
@@ -34,20 +166,9 @@ export const CommentEditorWrapper: React.FC<Props> = ({
   setIsLoading,
   initialConfig,
 }) => {
-  const { state } = useDashboard();
-  const availableActions = state.actions.availableActions || [];
-  const functions = useFunctionsFromActions(availableActions);
-  const tools = generateFunctionDeclarations(availableActions);
   const latestMessagesRef = useRef<AiMessage[]>(messages);
   const [isStreamActive, setStreamActive] = useState(false);
 
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
-    tools: [tools],
-  });
-
-  console.log("model", model);
-  
   useEffect(() => {
     latestMessagesRef.current = messages;
   }, [messages]);

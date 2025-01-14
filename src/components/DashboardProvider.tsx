@@ -93,10 +93,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
             ...state,
             actions: {
               ...state.actions,
-              availableActions: [
-                ...state.actions.availableActions,
-                action.payload,
-              ],
+              availableActions: action.payload.availableActions,
             },
           };
         default:
