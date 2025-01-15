@@ -16,7 +16,7 @@ import { DeleteLandInfosDialog } from "./delete-landInfo-dialog";
 import { getColumns } from "./table-columns";
 import { LandInfoTableToolbarActions } from "./table-toolbar-actions";
 import { UpdateSheet } from "./update-landInfo-sheet";
-import { useDashboard } from "@/hooks/useDashboard";
+import { useDashboard } from "@/hooks/useAiboard";
 
 interface LandInfoTableProps {
   promises: Promise<

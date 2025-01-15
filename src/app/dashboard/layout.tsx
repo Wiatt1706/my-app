@@ -8,7 +8,7 @@ import { Suspense } from "react";
 import SidebarLeft from "@/components/layout/sidebar-left";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { TableAi } from "../ai/_components/TableAi";
-import { DashboardProvider } from "@/components/DashboardProvider";
+import { AiboardProvider } from "@/components/AiboardProvider";
 
 export const metadata: Metadata = {
   title: "Next Shadcn Dashboard Starter",
@@ -29,7 +29,7 @@ export default async function DashboardLayout({
   ]);
 
   return (
-    <DashboardProvider>
+    <AiboardProvider>
       <KBar promises={promises}>
         <SidebarProvider defaultOpen={defaultOpen}>
           <Suspense fallback={<SidebarMenuSkeleton showIcon={true} />}>
@@ -44,13 +44,13 @@ export default async function DashboardLayout({
                 {/* page main content ends */}
               </ResizablePanel>
               <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={25} maxSize={50}>
+              <ResizablePanel defaultSize={25} maxSize={50} className="min-w-[300px]">
                 <TableAi />
               </ResizablePanel>
             </ResizablePanelGroup>
           </SidebarInset>
         </SidebarProvider>
       </KBar>
-    </DashboardProvider>
+    </AiboardProvider>
   );
 }

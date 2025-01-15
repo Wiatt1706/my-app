@@ -1,9 +1,9 @@
 import { AvailableAction } from "@/app/dashboard/menu/_lib/ai";
-import { DashboardContext } from "@/components/DashboardProvider";
+import { AiboardContext } from "@/components/AiboardProvider";
 import React, { useContext } from "react";
 
-export const useDashboard = () => {
-  const context = useContext(DashboardContext);
+export const useAiboard = () => {
+  const context = useContext(AiboardContext);
   if (!context) {
     throw new Error("useDashboard must be used within a DashboardProvider");
   }
@@ -11,7 +11,7 @@ export const useDashboard = () => {
 };
 
 export const useRegisterAction = (action: AvailableAction) => {
-  const { dispatch } = useDashboard();
+  const { dispatch } = useAiboard();
   React.useEffect(() => {
     dispatch({ type: "REGISTER_ACTION", payload: action });
   }, [action, dispatch]);

@@ -1,6 +1,10 @@
+import { FunctionCall } from "@google/generative-ai";
+
 export type AiMessage = {
     role: "user" | "model" | "system";
-    parts: { text: string }[];
+    parts: { text: string, functionCalls?: FunctionCall[] | undefined }[];
+    interactive?: boolean;
+    onConfirm?: () => void;
 };
 
 export const callChatAPI = async (

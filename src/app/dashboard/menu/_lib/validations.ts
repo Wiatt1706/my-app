@@ -46,6 +46,17 @@ export const updateSchema = z.object({
   parentId: z.string().optional(),
 })
 
+export const selectSchema = z.object({
+  icon: z.string().optional(),
+  title: z.string().optional(),
+  url: z.string().optional(),
+  menuSort: z.number().optional(),
+  isActive: z.boolean().optional(),
+  menuType: z.enum(systemMenu.menuType.enumValues).optional(),
+  parentId: z.string().optional(),
+})
+
 export type GetDataSchema = Awaited<ReturnType<typeof searchParamsCache.parse>>
 export type CreateDataSchema = z.infer<typeof createSchema>
 export type UpdateDataSchema = z.infer<typeof updateSchema>
+export type SelectDataSchema = z.infer<typeof selectSchema>

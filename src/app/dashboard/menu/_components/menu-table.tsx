@@ -5,7 +5,7 @@ import { systemMenu, type SystemMenu } from "@/db/schema";
 import type { DataTableAdvancedFilterField, DataTableRowAction } from "@/types";
 import { useDataTable } from "@/hooks/use-data-table";
 import { DataTable } from "@/components/data-table/data-table";
-import type {
+import {
   getSystemMenusWithChildren,
   SystemMenuWithChildren,
 } from "../_lib/queries";
@@ -18,9 +18,9 @@ import { TableFloatingBar } from "./table-floating-bar";
 import { getExpandedRowModel } from "@tanstack/react-table";
 import { CreateSheet } from "./create-systemMenu-sheet";
 import { getMenuTypeContent } from "../_lib/utils";
-import { useDashboard } from "@/hooks/useDashboard";
-import { createSchema } from "../_lib/validations";
-import { createSystemMenu } from "../_lib/actions";
+import { useAiboard } from "@/hooks/useAiboard";
+import { createSchema, selectSchema } from "../_lib/validations";
+import { createSystemMenu, getMenusWithChildrenByAi } from "../_lib/actions";
 
 export const MenuTableFilterFields: DataTableAdvancedFilterField<SystemMenu>[] =
   [
@@ -94,7 +94,7 @@ export function MenuTable({ promises }: TableProps) {
       !!(row.original as SystemMenuWithChildren).children?.length,
   });
 
-  const { state, dispatch } = useDashboard();
+  const { dispatch } = useAiboard();
 
   React.useEffect(() => {
     // 设置页面信息
@@ -107,20 +107,19 @@ export function MenuTable({ promises }: TableProps) {
       },
     });
 
-    // 设置初始表格数据
-    dispatch({
-      type: "SET_TABLE_DATA",
-      payload: {
-        data: data,
-      },
-    });
-
     const actions = [
       {
         name: "createMenu",
-        description: "Create a new menu item.",
+        description: "创建菜单,注意必填参数，如果没有则你随机生成，必须保证必填参数有值",
         schema: createSchema,
         method: createSystemMenu,
+      },
+      {
+        name: "selectMenu",
+        description: "查询菜单",
+        schema: selectSchema,
+        method: getMenusWithChildrenByAi,
+        autoExecute: true,
       },
     ];
 

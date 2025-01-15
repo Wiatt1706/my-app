@@ -90,7 +90,7 @@ export function CreateSheet({ datas, ...props }: CreateSheetProps) {
 
       form.reset();
       props.onOpenChange?.(false);
-      toast.success("Menu updated");
+      toast.success("Menu created");
     });
   }
 

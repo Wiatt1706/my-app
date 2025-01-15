@@ -2,7 +2,7 @@
 import { AvailableAction } from "@/app/dashboard/menu/_lib/ai";
 import React, {  createContext, useReducer } from "react";
 
-export interface DashboardState {
+export interface AiboardState {
   pageInfo: {
     route: string;
     pageId: string;
@@ -27,7 +27,7 @@ export interface DashboardState {
   };
 }
 
-export interface DashboardAction {
+export interface AiboardAction {
   type:
     | "SET_PAGE_INFO"
     | "SET_QUERY"
@@ -37,7 +37,7 @@ export interface DashboardAction {
   payload: any;
 }
 
-const initialState: DashboardState = {
+const initialState: AiboardState = {
   pageInfo: {
     route: "/",
     pageId: "dashboard",
@@ -61,18 +61,18 @@ const initialState: DashboardState = {
   },
 };
 
-export const DashboardContext = createContext<{
-  state: DashboardState;
-  dispatch: React.Dispatch<DashboardAction>;
+export const AiboardContext = createContext<{
+  state: AiboardState;
+  dispatch: React.Dispatch<AiboardAction>;
 } | null>(null);
 
 
 
-export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
+export const AiboardProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [state, dispatch] = useReducer(
-    (state: DashboardState, action: DashboardAction): DashboardState => {
+    (state: AiboardState, action: AiboardAction): AiboardState => {
       switch (action.type) {
         case "SET_PAGE_INFO":
           return { ...state, pageInfo: action.payload };
@@ -104,8 +104,8 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   return (
-    <DashboardContext.Provider value={{ state, dispatch }}>
+    <AiboardContext.Provider value={{ state, dispatch }}>
       {children}
-    </DashboardContext.Provider>
+    </AiboardContext.Provider>
   );
 };

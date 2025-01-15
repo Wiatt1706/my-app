@@ -2,34 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { AiMessage } from "../_lib/chatApi";
 import { HeadTool } from "./HeadTool";
 import { MessageList } from "./MessageList";
 import { CommentEditorWrapper } from "./CommentEditorWrapper";
-import { useDashboard } from "@/hooks/useDashboard";
+import { useAiboard } from "@/hooks/useAiboard";
 
 
 export function TableAi() {
-  const { state } = useDashboard();
-
-  console.log("state:", state.actions.availableActions);
-  
-  const executeAction = async (
-    actionName: string,
-    params: Record<string, any>
-  ) => {
-    const action = state.actions.availableActions.find(
-      (a) => a.name === actionName
-    );
-    if (!action) {
-      console.error(`Action "${actionName}" not found.`);
-      return;
-    }
-    const result = await action.method(params);
-    console.log("Action result:", result);
-  };
-
   const [messages, setMessages] = useState<AiMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [scrollAreaHeight, setScrollAreaHeight] = useState("100%");
@@ -92,7 +72,6 @@ export function TableAi() {
           messages={messages}
           setMessages={setMessages}
           setIsLoading={setIsLoading}
-          initialConfig={{ systemPrompt: JSON.stringify(state.pageInfo) }}
         />
       </div>
     </div>

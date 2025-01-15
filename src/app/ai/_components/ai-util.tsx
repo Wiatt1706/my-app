@@ -10,11 +10,9 @@ import { ZodObject, ZodType, ZodOptional, ZodEnum } from "zod";
 export function generateFunctionDeclarations(
   actions: AvailableAction[]
 ): FunctionDeclarationsTool {
-  console.log("actions", actions);
 
   return {
     functionDeclarations: actions.map((action: AvailableAction) => {
-      console.log("action", action);
 
       if (!action.schema || !(action.schema instanceof ZodObject)) {
         throw new Error(
@@ -100,13 +98,23 @@ function actionToFunctionAdapter(
 
 export function useFunctionsFromActions(
   actions: AvailableAction[]
-): Record<string, (args: any) => Promise<any>> {
+): Record<
+  string,
+  { autoExecute: boolean; method: (args: any) => Promise<any> }
+> {
   return useMemo(() => {
-    const functions: Record<string, (args: any) => Promise<any>> = {};
+    const functions: Record<
+      string,
+      { autoExecute: boolean; method: (args: any) => Promise<any> }
+    > = {};
     actions.forEach((action) => {
-      const { name, method, schema } = action;
-      functions[name] = actionToFunctionAdapter(schema, method);
+      const { name, method, schema, autoExecute = false } = action;
+      functions[name] = {
+        autoExecute,
+        method: actionToFunctionAdapter(schema, method),
+      };
     });
     return functions;
   }, [actions]);
 }
+

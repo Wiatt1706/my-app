@@ -1,40 +1,27 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AiMessage } from "../_lib/chatApi";
 import { CommentEditor } from "./CommentEditor";
 import {
-  FunctionDeclarationsTool,
   GoogleGenerativeAI,
-  SchemaType,
 } from "@google/generative-ai";
-import { useDashboard } from "@/hooks/useDashboard";
+import { useAiboard } from "@/hooks/useAiboard";
 import { generateFunctionDeclarations, useFunctionsFromActions } from "./ai-util";
 
 const key = process.env.NEXT_PUBLIC_GEMINI_API;
 const genAI = new GoogleGenerativeAI(key!);
 
-type InitialConfig = {
-  systemPrompt?: string;
-  generationConfig?: {
-    maxOutputTokens?: number;
-    temperature?: number;
-    topP?: number;
-  };
-};
-
 type Props = {
   messages: AiMessage[];
   setMessages: React.Dispatch<React.SetStateAction<AiMessage[]>>;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
-  initialConfig?: InitialConfig;
 };
 
 export const CommentEditorWrapper: React.FC<Props> = ({
   messages,
   setMessages,
   setIsLoading,
-  initialConfig,
 }) => {
-  const { state } = useDashboard();
+  const { state } = useAiboard();
   const availableActions = state.actions.availableActions || [];
   const functions = useFunctionsFromActions(availableActions);
   const tools = generateFunctionDeclarations(availableActions);
@@ -46,107 +33,194 @@ export const CommentEditorWrapper: React.FC<Props> = ({
     tools: [tools],
   });
 
-  console.log("model", model);
-  
   useEffect(() => {
     latestMessagesRef.current = messages;
   }, [messages]);
 
-  const handleSend = async (text: string) => {
-    if (!text.trim() || isStreamActive) return;
+ const handleSend = async (text: string) => {
+   if (!text.trim() || isStreamActive) return;
 
-    const userMessage: AiMessage = { role: "user", parts: [{ text }] };
-    setMessages((prev) => [...prev, userMessage]);
-    setIsLoading(true);
-    setStreamActive(true);
+   const userMessage: AiMessage = { role: "user", parts: [{ text }] };
+   setMessages((prev) => [...prev, userMessage]);
+   setIsLoading(true);
+   setStreamActive(true);
 
-    try {
-      const chat = model.startChat({
-        history: latestMessagesRef.current,
-        generationConfig: initialConfig?.generationConfig || {
-          maxOutputTokens: 1000,
-        },
-      });
+   try {
+     const chat = model.startChat({
+       history: latestMessagesRef.current.filter(
+         (message) => !message.interactive
+       ),
+       generationConfig: {
+         maxOutputTokens: 1000,
+       },
+     });
 
-      // Step 1: 使用 sendMessage 检查是否存在函数调用
-      const preliminaryResult = await chat.sendMessage(text);
-      const preliminaryResponse = await preliminaryResult.response;
+     const preliminaryResult = await chat.sendMessage(text);
+     const preliminaryResponse = preliminaryResult.response;
 
-      const functionCalls = await preliminaryResponse.functionCalls();
-      if (Array.isArray(functionCalls) && functionCalls.length > 0) {
-        const functionResponses = []; // 用于存储所有函数调用的响应
+     const functionCalls = preliminaryResponse.functionCalls();
+     if (Array.isArray(functionCalls) && functionCalls.length > 0) {
+       // 将函数调用分为自动执行和非自动执行
+       const autoExecuteCalls = functionCalls.filter(
+         (call) => functions[call.name]?.autoExecute
+       );
+       const manualExecuteCalls = functionCalls.filter(
+         (call) => !functions[call.name]?.autoExecute
+       );
 
-        for (const functionCall of functionCalls) {
-          const { name, args } = functionCall;
+       const autoResponses = [];
+       const placeholderResponses = [];
 
-          if (functions[name]) {
-            try {
-              const apiResponse = await functions[name](args);
-              // 将响应存储到数组中
-              functionResponses.push({
-                name,
-                response: apiResponse,
-              });
-            } catch (error) {
-              console.error(`Error executing function ${name}:`, error);
-              functionResponses.push({
-                name,
-                response: `执行函数 ${name} 时发生错误。`,
-              });
-            }
-          } else {
-            console.warn(`No handler for function ${name}`);
-            functionResponses.push({
-              name,
-              response: `未找到函数 ${name} 的处理程序。`,
-            });
-          }
-        }
+       // 自动执行函数调用处理
+       for (const autoCall of autoExecuteCalls) {
+         const { name, args } = autoCall;
 
-        // 将所有响应一次性发送给模型
-        const finalResult = await chat.sendMessage(
-          functionResponses.map((funcResponse) => ({
-            functionResponse: funcResponse,
-          }))
-        );
+         if (functions[name]) {
+           try {
+             const apiResponse = await functions[name].method(args);
+             autoResponses.push({
+               name,
+               response: apiResponse,
+             });
+           } catch (error) {
+             console.error(`Error executing function ${name}:`, error);
+             autoResponses.push({
+               name,
+               response: {
+                 status: "error",
+                 message: `Error executing ${name}.`,
+               },
+             });
+           }
+         }
+       }
 
-        const finalResponseText = await finalResult.response.text();
-        setMessages((prev) => [
-          ...prev,
-          { role: "model", parts: [{ text: finalResponseText }] },
-        ]);
+       // 为非自动执行的函数生成占位符响应
+       for (const manualCall of manualExecuteCalls) {
+         placeholderResponses.push({
+           name: manualCall.name,
+           response: {
+             status: "pending",
+             message: `Waiting for user confirmation to execute ${manualCall.name}.`,
+           },
+         });
+       }
 
-        return; // 函数调用已处理完成，结束处理。
-      }
+       // 确保发送的响应数量与函数调用数量一致
+       const allResponses = [...autoResponses, ...placeholderResponses];
 
-      // Step 2: 如果没有函数调用，改为流式处理
-      const streamResult = await chat.sendMessageStream(text);
+       if (allResponses.length !== functionCalls.length) {
+         throw new Error(
+           `The number of function responses (${allResponses.length}) does not match the number of function calls (${functionCalls.length})`
+         );
+       }
 
-      // 流式响应处理
-      let fullResponse = "";
-      const modelMessage: AiMessage = { role: "model", parts: [{ text: "" }] };
-      setMessages((prev) => [...prev, modelMessage]);
+       // 将自动执行的响应与占位符响应合并发送
+       const allResults = await chat.sendMessage(
+         allResponses.map((resp) => ({ functionResponse: resp }))
+       );
 
-      for await (const chunk of streamResult.stream) {
-        const chunkText = chunk.text();
-        fullResponse += chunkText;
-        setMessages((prev) => {
-          const updated = [...prev];
-          updated[updated.length - 1].parts[0].text = fullResponse;
-          return updated;
-        });
-      }
-    } catch (error) {
-      console.error("Error calling Gemini API:", error);
-      setMessages((prev) => [
-        ...prev,
-        { role: "model", parts: [{ text: "抱歉，发生了一个错误。" }] },
-      ]);
-    } finally {
-      setIsLoading(false);
-      setStreamActive(false);
-    }
-  };
+       // 处理自动响应的最终文本
+       const finalResponseText = await allResults.response.text();
+       setMessages((prev) => [
+         ...prev,
+         { role: "model", parts: [{ text: finalResponseText }] },
+       ]);
+
+       // 处理非自动执行函数的确认
+       if (manualExecuteCalls.length > 0) {
+         const functionCallMessage: AiMessage = {
+           role: "model",
+           parts: [
+             {
+               text: "以下函数调用需要您的确认：",
+               functionCalls: manualExecuteCalls,
+             },
+           ],
+           interactive: true,
+           onConfirm: async () => {
+             try {
+               const manualResponses = [];
+               for (const manualCall of manualExecuteCalls) {
+                 const { name, args } = manualCall;
+
+                 if (functions[name]) {
+                   try {
+                     const apiResponse = await functions[name].method(args);
+                     manualResponses.push({
+                       name,
+                       response: apiResponse,
+                     });
+                   } catch (error) {
+                     console.error(`Error executing function ${name}:`, error);
+                     manualResponses.push({
+                       name,
+                       response: {
+                         status: "error",
+                         message: `Error executing ${name}.`,
+                       },
+                     });
+                   }
+                 }
+               }
+
+               // 将用户确认后的响应发送给模型
+               const manualResult = await chat.sendMessage(
+                 manualResponses.map((resp) => ({ functionResponse: resp }))
+               );
+
+               const manualResponseText = await manualResult.response.text();
+               setMessages((prev) => [
+                 ...prev,
+                 { role: "model", parts: [{ text: manualResponseText }] },
+               ]);
+             } catch (error) {
+               console.error("Error handling manual function calls:", error);
+               setMessages((prev) => [
+                 ...prev,
+                 {
+                   role: "model",
+                   parts: [{ text: "处理手动函数调用时发生错误。" }],
+                 },
+               ]);
+             }
+           },
+         };
+
+         setMessages((prev) => [...prev, functionCallMessage]);
+       }
+
+       setStreamActive(false); // 停止流式处理
+       return;
+     }
+
+     // 如果没有函数调用，则流式处理响应
+     const streamResult = await chat.sendMessageStream(text);
+
+     let fullResponse = "";
+     const modelMessage: AiMessage = { role: "model", parts: [{ text: "" }] };
+     setMessages((prev) => [...prev, modelMessage]);
+
+     for await (const chunk of streamResult.stream) {
+       const chunkText = chunk.text();
+       fullResponse += chunkText;
+       setMessages((prev) => {
+         const updated = [...prev];
+         updated[updated.length - 1].parts[0].text = fullResponse;
+         return updated;
+       });
+     }
+   } catch (error) {
+     console.error("Error calling Gemini API:", error);
+     setMessages((prev) => [
+       ...prev,
+       { role: "model", parts: [{ text: "抱歉，发生了一个错误。" }] },
+     ]);
+   } finally {
+     setIsLoading(false);
+     setStreamActive(false);
+   }
+ };
 
   return (
     <CommentEditor
