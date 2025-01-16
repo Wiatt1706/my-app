@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { Separator } from "@/components/ui/separator";
 import { AiMessage } from "../_lib/chatApi";
 import { HeadTool } from "./HeadTool";
-import { MessageList } from "./MessageList";
+import { MessageList } from "./message/MessageList";
 import { CommentEditorWrapper } from "./CommentEditorWrapper";
 import { useAiboard } from "@/hooks/useAiboard";
 

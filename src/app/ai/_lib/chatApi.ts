@@ -2,7 +2,7 @@ import { FunctionCall } from "@google/generative-ai";
 
 export type AiMessage = {
     role: "user" | "model" | "system";
-    parts: { text: string, functionCalls?: FunctionCall[] | undefined }[];
+    parts: { text: string, manualFunctionCalls?: FunctionCall[] | undefined, autoFunctionCalls?: FunctionCall[] }[];
     interactive?: boolean;
     onConfirm?: () => void;
 };

@@ -16,7 +16,7 @@ import { DeleteLandInfosDialog } from "./delete-landInfo-dialog";
 import { getColumns } from "./table-columns";
 import { LandInfoTableToolbarActions } from "./table-toolbar-actions";
 import { UpdateSheet } from "./update-landInfo-sheet";
-import { useDashboard } from "@/hooks/useAiboard";
+import { useAiboard } from "@/hooks/useAiboard";
 
 interface LandInfoTableProps {
   promises: Promise<
@@ -81,7 +81,7 @@ export function LandInfosTable({ promises }: LandInfoTableProps) {
     clearOnDefault: true,
   });
 
-  const { state, dispatch } = useDashboard();
+  const { dispatch } = useAiboard();
 
   React.useEffect(() => {
     // 设置页面信息

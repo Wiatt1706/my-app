@@ -1,4 +1,5 @@
-import { AiMessage } from "../_lib/chatApi";
+import React from "react";
+import { AiMessage } from "../../_lib/chatApi";
 import { MessageItem } from "./MessageItem";
 
 type Props = {
@@ -7,7 +8,7 @@ type Props = {
 
 export const MessageList: React.FC<Props> = ({ messages }) => {
   return (
-    <div className="p-4 max-w-full ">
+    <div className="p-4 max-w-full">
       {messages.map((message, index) => (
         <MessageItem key={index} message={message} />
       ))}

@@ -44,7 +44,7 @@ export default async function DashboardLayout({
                 {/* page main content ends */}
               </ResizablePanel>
               <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={25} maxSize={50} className="min-w-[300px]">
+              <ResizablePanel defaultSize={25} maxSize={50} >
                 <TableAi />
               </ResizablePanel>
             </ResizablePanelGroup>

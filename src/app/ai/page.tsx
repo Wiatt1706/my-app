@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { MessageList } from "./_components/MessageList";
+import { MessageList } from "./_components/message/MessageList";
 import { CommentEditorWrapper } from "./_components/CommentEditorWrapper";
 import { AiMessage } from "./_lib/chatApi";
 import { HeadTool } from "./_components/HeadTool";
