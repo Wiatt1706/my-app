@@ -11,7 +11,7 @@ export const MessageItem: React.FC<Props> = ({ message }) => {
   const isUser = message.role === "user";
 
   return (
-    <div className={`mb-4 flex ${isUser ? "justify-end" : "justify-start"}`}>
+    <div className={`mb-4 flex ${isUser && "justify-end"}`}>
       {isUser ? (
         <UserMessage text={message.parts[0].text} />
       ) : (

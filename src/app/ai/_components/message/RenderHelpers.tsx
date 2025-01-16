@@ -107,25 +107,26 @@ export const renderManualFunctionCalls = (
 export const renderAutoFunctionCalls = (
   functionCalls: Array<{ name: string; args: Record<string, any> }>
 ) => (
-  <Tooltip>
-    <Popover>
-      <PopoverTrigger asChild>
-        <TooltipTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <InfoIcon className="h-4 w-4" />
-            <span className="sr-only">查看详情</span>
-          </Button>
-        </TooltipTrigger>
-      </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-2">
-        <div className="text-sm">
-          <span className="font-bold">自动执行参数</span>
-          <pre className="bg-muted p-2 rounded text-xs mt-2 overflow-x-auto">
-            {JSON.stringify(functionCalls, null, 2)}
-          </pre>
-        </div>
-      </PopoverContent>
-    </Popover>
-    <TooltipContent>点击查看详细信息</TooltipContent>
-  </Tooltip>
+  <div className="w-full flex justify-center">
+    <Tooltip>
+      <Popover>
+        <PopoverTrigger asChild>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="sm">
+              已经自动执行{functionCalls.length}个方法
+              <InfoIcon />
+            </Button>
+          </TooltipTrigger>
+        </PopoverTrigger>
+        <PopoverContent className="w-[400px] p-2">
+          <div className="text-sm">
+            <pre className="bg-muted p-2 rounded text-xs overflow-x-auto">
+              {JSON.stringify(functionCalls, null, 2)}
+            </pre>
+          </div>
+        </PopoverContent>
+      </Popover>
+      <TooltipContent>点击查看详细信息</TooltipContent>
+    </Tooltip>
+  </div>
 );

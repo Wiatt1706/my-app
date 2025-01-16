@@ -8,7 +8,7 @@ type Props = {
 
 export const AiResponse: React.FC<Props> = ({ message }) => {
 	return (
-		<div className="inline-block rounded-lg max-w-full text-sm break-words space-y-2">
+		<div className="inline-block rounded-lg w-full text-sm break-words space-y-2">
 			{/* Render text or markdown */}
 			{renderMarkdown(message.parts[0].text)}
 
