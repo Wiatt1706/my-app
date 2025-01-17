@@ -1,6 +1,6 @@
 "use client";
 import { AvailableAction } from "@/app/dashboard/menu/_lib/ai";
-import React, {  createContext, useReducer } from "react";
+import React, { createContext, useReducer } from "react";
 
 export interface AiboardState {
   pageInfo: {
@@ -25,6 +25,7 @@ export interface AiboardState {
     availableActions: AvailableAction[];
     selectedRows: any[];
   };
+  isVisible: boolean; // Add isVisible to the state
 }
 
 export interface AiboardAction {
@@ -33,7 +34,8 @@ export interface AiboardAction {
     | "SET_QUERY"
     | "SET_PAGINATION"
     | "SET_TABLE_DATA"
-    | "REGISTER_ACTION";
+    | "REGISTER_ACTION"
+    | "SET_VISIBILITY"; // Add SET_VISIBILITY type
   payload: any;
 }
 
@@ -59,14 +61,13 @@ const initialState: AiboardState = {
     availableActions: [],
     selectedRows: [],
   },
+  isVisible: true, // Initialize isVisible
 };
 
 export const AiboardContext = createContext<{
   state: AiboardState;
   dispatch: React.Dispatch<AiboardAction>;
 } | null>(null);
-
-
 
 export const AiboardProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -96,6 +97,8 @@ export const AiboardProvider: React.FC<{ children: React.ReactNode }> = ({
               availableActions: action.payload.availableActions,
             },
           };
+        case "SET_VISIBILITY": // Handle SET_VISIBILITY
+          return { ...state, isVisible: action.payload };
         default:
           return state;
       }

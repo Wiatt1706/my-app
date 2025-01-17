@@ -26,8 +26,13 @@ import {
 } from "@/components/ui/tooltip";
 import { useAiboard } from "@/hooks/useAiboard";
 import { Archive, Clock, MoreVertical, Trash2 } from "lucide-react";
+import { AiMessage } from "../_lib/chatApi";
 
-export const HeadTool: React.FC = () => {
+interface HeadToolProps {
+  setMessages: React.Dispatch<React.SetStateAction<AiMessage[]>>;
+}
+
+export const HeadTool: React.FC<HeadToolProps> = ({ setMessages }) => {
   const { state } = useAiboard();
   const { pageInfo, actions } = state;
 
@@ -60,6 +65,13 @@ export const HeadTool: React.FC = () => {
     </Dialog>
   );
 
+  // 清除缓存并清空当前信息的处理函数
+  const handleClearData = () => {
+	setMessages([]);
+    // 清除 localStorage 中的缓存数据
+    localStorage.removeItem("messages");
+  };
+
   return (
     <>
       <div className="flex items-center p-2">
@@ -79,7 +91,11 @@ export const HeadTool: React.FC = () => {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleClearData} // 点击时清除缓存和当前信息
+              >
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">Move to trash</span>
               </Button>

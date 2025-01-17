@@ -6,8 +6,6 @@ import { AiMessage } from "../_lib/chatApi";
 import { HeadTool } from "./HeadTool";
 import { MessageList } from "./message/MessageList";
 import { CommentEditorWrapper } from "./CommentEditorWrapper";
-import { useAiboard } from "@/hooks/useAiboard";
-
 
 export function TableAi() {
   const [messages, setMessages] = useState<AiMessage[]>([]);
@@ -19,6 +17,22 @@ export function TableAi() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // 从localStorage加载消息
+  useEffect(() => {
+    const savedMessages = localStorage.getItem("messages");
+    if (savedMessages) {
+      setMessages(JSON.parse(savedMessages));
+    }
+  }, []);
+
+  // 每次更新messages时，将它们保存到localStorage
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem("messages", JSON.stringify(messages));
+    }
+  }, [messages]);
+
+  // 滚动到底部
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -57,7 +71,7 @@ export function TableAi() {
   return (
     <div className="relative flex flex-col h-full w-full">
       <div ref={headToolRef}>
-        <HeadTool />
+        <HeadTool setMessages={setMessages} />
       </div>
       <div
         style={{ maxHeight: scrollAreaHeight, width: "100%" }}

@@ -9,11 +9,14 @@ import { ZodObject, ZodType, ZodOptional, ZodEnum } from "zod";
 
 export function generateFunctionDeclarations(
   actions: AvailableAction[]
-): FunctionDeclarationsTool {
+): FunctionDeclarationsTool | undefined {
+  // 如果 actions 长度小于等于 0，直接返回 undefined
+  if (actions.length <= 0) {
+    return undefined;
+  }
 
   return {
     functionDeclarations: actions.map((action: AvailableAction) => {
-
       if (!action.schema || !(action.schema instanceof ZodObject)) {
         throw new Error(
           `Invalid schema for action "${action.name}". Expected a ZodObject.`

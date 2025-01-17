@@ -4,9 +4,10 @@ import { Separator } from "../ui/separator";
 import { Breadcrumbs } from "../breadcrumbs";
 import SearchInput from "../search-input";
 import { UserNav } from "./user-nav";
-import ThemeToggle from "./ThemeToggle/theme-toggle";
+import AiToggle from "./AiToggle";
 
 export default function Header() {
+ 
   return (
     <header className="flex z-50 sticky top-0 bg-background border-b h-12 shrink-0 items-center justify-between gap-2 transition-[width,height] ease-linear ">
       <div className="flex items-center gap-2 px-4">
@@ -20,8 +21,7 @@ export default function Header() {
           <SearchInput />
         </div>
         <UserNav />
-        <ThemeToggle />
-        <SidebarTrigger className="-mr-1 ml-auto rotate-180" />
+        <AiToggle/>
       </div>
     </header>
   );

@@ -6,9 +6,8 @@ import { cookies } from "next/headers";
 import { getNavMenus } from "./_lib/queries";
 import { Suspense } from "react";
 import SidebarLeft from "@/components/layout/sidebar-left";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { TableAi } from "../ai/_components/TableAi";
 import { AiboardProvider } from "@/components/AiboardProvider";
+import ResizablePanelContent from "@/components/layout/ResizablePanelContent";
 
 export const metadata: Metadata = {
   title: "Next Shadcn Dashboard Starter",
@@ -37,17 +36,7 @@ export default async function DashboardLayout({
           </Suspense>
           <SidebarInset>
             <Header />
-            <ResizablePanelGroup direction="horizontal">
-              <ResizablePanel defaultSize={75}>
-                {/* page main content */}
-                {children}
-                {/* page main content ends */}
-              </ResizablePanel>
-              <ResizableHandle withHandle />
-              <ResizablePanel defaultSize={25} maxSize={50} >
-                <TableAi />
-              </ResizablePanel>
-            </ResizablePanelGroup>
+            <ResizablePanelContent>{children}</ResizablePanelContent>
           </SidebarInset>
         </SidebarProvider>
       </KBar>

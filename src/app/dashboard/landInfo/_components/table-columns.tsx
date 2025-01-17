@@ -5,10 +5,8 @@ import { landInfo, type LandInfo } from "@/db/schema";
 import { type DataTableRowAction } from "@/types";
 import { type ColumnDef } from "@tanstack/react-table";
 import { Ellipsis } from "lucide-react";
-
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
