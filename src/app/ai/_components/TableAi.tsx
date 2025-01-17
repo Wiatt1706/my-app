@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Separator } from "@/components/ui/separator";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { AiMessage } from "../_lib/chatApi";
 import { HeadTool } from "./HeadTool";
 import { MessageList } from "./message/MessageList";
@@ -16,6 +23,24 @@ export function TableAi() {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const templates = [
+    {
+      title: "Recursion Explanation",
+      description: "Learn about recursion with examples.",
+      content: "Can you explain the concept of recursion with examples?",
+    },
+    {
+      title: "Sorting Algorithms",
+      description: "Understand different sorting algorithms.",
+      content: "Can you compare bubble sort and quicksort?",
+    },
+    {
+      title: "JavaScript Closures",
+      description: "Deep dive into closures in JavaScript.",
+      content: "What are closures in JavaScript, and how are they used?",
+    },
+  ];
 
   // 从localStorage加载消息
   useEffect(() => {
@@ -75,10 +100,45 @@ export function TableAi() {
       </div>
       <div
         style={{ maxHeight: scrollAreaHeight, width: "100%" }}
-        className="w-full overflow-auto "
+        className="w-full overflow-auto"
       >
-        <MessageList messages={messages} />
-        <div ref={messagesEndRef} />
+        {messages.length > 0 ? (
+          <>
+            <MessageList messages={messages} />
+            <div ref={messagesEndRef} />
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full p-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {templates.map((template, index) => (
+                <Card
+                  key={index}
+                  className="w-full cursor-pointer"
+                  onClick={() => {
+                    setMessages((prevMessages) => [
+                      ...prevMessages,
+                      {
+                        role: "user",
+                        parts: [
+                          {
+                            text: template.content,
+                            manualFunctionCalls: [],
+                            autoFunctionCalls: [],
+                          },
+                        ]
+                      },
+                    ]);
+                  }}
+                >
+                  <CardHeader>
+                    <CardTitle>{template.title}</CardTitle>
+                    <CardDescription>{template.description}</CardDescription>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
       <div ref={bottomRef} className="absolute bottom-0 w-full bg-background">
         <Separator className="mt-auto" />

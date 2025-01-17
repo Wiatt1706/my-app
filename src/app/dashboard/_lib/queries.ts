@@ -9,7 +9,7 @@ import {
 import { unstable_cache } from "@/lib/unstable-cache"
 
 export interface SystemMenuWithChildren extends SystemMenu {
-  children: SystemMenu[];
+  children?: SystemMenu[];
 }
 
 export async function getNavMenus() {
@@ -39,7 +39,7 @@ export async function getNavMenus() {
           if (menu.parentId) {
             const parent = menuMap.get(menu.parentId);
             if (parent) {
-              parent.children.push(menuMap.get(menu.id)!);
+              parent.children?.push(menuMap.get(menu.id)!);
             }
           } else {
             rootMenus.push(menuMap.get(menu.id)!);

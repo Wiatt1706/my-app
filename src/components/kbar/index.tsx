@@ -1,102 +1,98 @@
-'use client';
+"use client";
 import {
-	KBarAnimator,
-	KBarPortal,
-	KBarPositioner,
-	KBarProvider,
-	KBarSearch
-} from 'kbar';
-import { useRouter } from 'next/navigation';
-import React, { useMemo } from 'react';
-import RenderResults from './render-result';
-import useThemeSwitching from './use-theme-switching';
-import { SystemMenuWithChildren, getNavMenus } from '@/app/dashboard/_lib/queries';
-import { RenderIcon } from '../icons';
-
+  KBarAnimator,
+  KBarPortal,
+  KBarPositioner,
+  KBarProvider,
+  KBarSearch,
+} from "kbar";
+import { useRouter } from "next/navigation";
+import React, { useMemo } from "react";
+import RenderResults from "./render-result";
+import useThemeSwitching from "./use-theme-switching";
+import {
+  SystemMenuWithChildren,
+  getNavMenus,
+} from "@/app/dashboard/_lib/queries";
+import { RenderIcon } from "../icons";
 
 interface KBarProps {
-	promises: Promise<[Awaited<ReturnType<typeof getNavMenus>>]>;
-	children: React.ReactNode;
+  promises: Promise<[Awaited<ReturnType<typeof getNavMenus>>]>;
+  children: React.ReactNode;
 }
+
 export default function KBar({ promises, children }: KBarProps) {
-	const [{ data }] = React.use(promises);
-	const router = useRouter();
+  const [{ data }] = React.use(promises);
+  const router = useRouter();
 
-	const navItems = [...data.navMainDatas, ...data.projectsDatas];
-	const navigateTo = (url: string) => {
-		router.push(url);
-	};
+  const navItems = [...data.navMainDatas, ...data.projectsDatas];
+  const navigateTo = (url: string) => {
+    router.push(url);
+  };
 
-	// These action are for the navigation
-	const actions = useMemo(
-    () =>
-      navItems.flatMap((navItem: SystemMenuWithChildren) => {
-        // Only include base action if the navItem has a real URL and is not just a container
-        const baseAction =
-          navItem.url !== "#"
-            ? {
-                id: `${navItem.title.toLowerCase()}Action`,
-                name: navItem.title,
-                icon: RenderIcon(navItem.icon as string),
-                shortcut: navItem.shortcut ?? [],
-                keywords: navItem.title.toLowerCase(),
-                section: "Navigation",
-                subtitle: `Go to ${navItem.title}`,
-                perform: () => {
-                  if (navItem.url !== null) {
-                    navigateTo(navItem.url);
-                  }
-                },
-              }
-            : null;
+  // These actions are for the navigation
+  const actions = useMemo(() => {
+    // Recursive function to generate actions for each item
+    const generateActions = (
+      navItem: SystemMenuWithChildren,
+      parentSection?: string
+    ): NonNullable<typeof baseAction>[] => {
+      // Base action for items with a valid URL
+      const baseAction = navItem.url
+        ? {
+            id: `${navItem.title.toLowerCase()}Action`,
+            name: navItem.title,
+            icon: RenderIcon(navItem.icon as string),
+            shortcut: navItem.shortcut ?? [],
+            keywords: navItem.title.toLowerCase(),
+            section: parentSection || "Navigation",
+            subtitle: `Go to ${navItem.title}`,
+            perform: () => navigateTo(navItem.url as string),
+          }
+        : null;
 
-        // Map child items into actions
-        const childActions =
-          navItem.children?.map((childItem) => ({
-            id: `${childItem.title.toLowerCase()}Action`,
-            name: childItem.title,
-            icon: RenderIcon(childItem.icon as string),
-            shortcut: childItem.shortcut ?? [],
-            keywords: childItem.title.toLowerCase(),
-            section: navItem.title,
-            subtitle: `Go to ${childItem.title}`,
-            perform: () => {
-              if (navItem.url !== null) {
-                navigateTo(navItem.url);
-              }
-            },
-          })) ?? [];
+      // Recursively generate child actions
+      const childActions =
+        navItem.children?.flatMap((childItem) =>
+          generateActions(childItem, navItem.title)
+        ) ?? [];
 
-        // Return only valid actions (ignoring null base actions for containers)
-        return baseAction ? [baseAction, ...childActions] : childActions;
-      }),
-    [data]
+      // Combine the base action and child actions, filtering out nulls
+      return [baseAction, ...childActions].filter(
+        (action): action is NonNullable<typeof action> => action !== null
+      );
+    };
+
+    // Map over top-level items and generate actions for all levels
+    return navItems.flatMap((navItem) => generateActions(navItem));
+  }, [data]);
+
+
+  return (
+    <KBarProvider actions={actions}>
+      <KBarComponent>{children}</KBarComponent>
+    </KBarProvider>
   );
-
-	return (
-		<KBarProvider actions={actions} >
-			<KBarComponent>{children}</KBarComponent>
-		</KBarProvider>
-	);
 }
-const KBarComponent = ({ children }: { children: React.ReactNode }) => {
-	useThemeSwitching();
 
-	return (
-		<>
-			<KBarPortal>
-				<KBarPositioner className="scrollbar-hide fixed inset-0 z-[99999] bg-black/80  !p-0 backdrop-blur-sm">
-					<KBarAnimator className="relative !mt-64 w-full max-w-[600px] !-translate-y-12 overflow-hidden rounded-lg border bg-background text-foreground shadow-lg">
-						<div className="bg-background">
-							<div className="border-x-0 border-b-2">
-								<KBarSearch className="w-full border-none bg-background px-6 py-4 text-lg outline-none focus:outline-none focus:ring-0 focus:ring-offset-0" />
-							</div>
-							<RenderResults />
-						</div>
-					</KBarAnimator>
-				</KBarPositioner>
-			</KBarPortal>
-			{children}
-		</>
-	);
+const KBarComponent = ({ children }: { children: React.ReactNode }) => {
+  useThemeSwitching();
+
+  return (
+    <>
+      <KBarPortal>
+        <KBarPositioner className="scrollbar-hide fixed inset-0 z-[99999] bg-black/80  !p-0 backdrop-blur-sm">
+          <KBarAnimator className="relative !mt-64 w-full max-w-[600px] !-translate-y-12 overflow-hidden rounded-lg border bg-background text-foreground shadow-lg">
+            <div className="bg-background">
+              <div className="border-x-0 border-b-2">
+                <KBarSearch className="w-full border-none bg-background px-6 py-4 text-lg outline-none focus:outline-none focus:ring-0 focus:ring-offset-0" />
+              </div>
+              <RenderResults />
+            </div>
+          </KBarAnimator>
+        </KBarPositioner>
+      </KBarPortal>
+      {children}
+    </>
+  );
 };
