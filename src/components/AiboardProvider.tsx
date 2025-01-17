@@ -25,7 +25,8 @@ export interface AiboardState {
     availableActions: AvailableAction[];
     selectedRows: any[];
   };
-  isVisible: boolean; // Add isVisible to the state
+  selectedRow: any | null; // Add selectedRow to the state
+  isVisible: boolean;
 }
 
 export interface AiboardAction {
@@ -35,7 +36,8 @@ export interface AiboardAction {
     | "SET_PAGINATION"
     | "SET_TABLE_DATA"
     | "REGISTER_ACTION"
-    | "SET_VISIBILITY"; // Add SET_VISIBILITY type
+    | "SET_VISIBILITY"
+    | "SET_SELECTED_ROW"; // Add SET_SELECTED_ROW type
   payload: any;
 }
 
@@ -61,7 +63,8 @@ const initialState: AiboardState = {
     availableActions: [],
     selectedRows: [],
   },
-  isVisible: true, // Initialize isVisible
+  selectedRow: null, // Initialize selectedRow
+  isVisible: true,
 };
 
 export const AiboardContext = createContext<{
@@ -97,8 +100,10 @@ export const AiboardProvider: React.FC<{ children: React.ReactNode }> = ({
               availableActions: action.payload.availableActions,
             },
           };
-        case "SET_VISIBILITY": // Handle SET_VISIBILITY
+        case "SET_VISIBILITY":
           return { ...state, isVisible: action.payload };
+        case "SET_SELECTED_ROW": // Handle SET_SELECTED_ROW
+          return { ...state, selectedRow: action.payload };
         default:
           return state;
       }

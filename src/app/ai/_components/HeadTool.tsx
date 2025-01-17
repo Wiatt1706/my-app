@@ -25,7 +25,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useAiboard } from "@/hooks/useAiboard";
-import { Archive, Clock, MoreVertical, Trash2 } from "lucide-react";
+import {
+  Clock,
+  MoreVertical,
+  PanelLeft,
+  PanelRightClose,
+  RefreshCcw,
+  Trash2,
+} from "lucide-react";
 import { AiMessage } from "../_lib/chatApi";
 
 interface HeadToolProps {
@@ -33,7 +40,7 @@ interface HeadToolProps {
 }
 
 export const HeadTool: React.FC<HeadToolProps> = ({ setMessages }) => {
-  const { state } = useAiboard();
+  const { state, dispatch } = useAiboard();
   const { pageInfo, actions } = state;
 
   // Reusable Dialog Component
@@ -67,9 +74,16 @@ export const HeadTool: React.FC<HeadToolProps> = ({ setMessages }) => {
 
   // 清除缓存并清空当前信息的处理函数
   const handleClearData = () => {
-	setMessages([]);
+    setMessages([]);
     // 清除 localStorage 中的缓存数据
     localStorage.removeItem("messages");
+  };
+
+  const toggleAi = () => {
+    dispatch({
+      type: "SET_VISIBILITY",
+      payload: !state.isVisible,
+    });
   };
 
   return (
@@ -79,16 +93,17 @@ export const HeadTool: React.FC<HeadToolProps> = ({ setMessages }) => {
         <div className="flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <Archive className="h-4 w-4" />
-                <span className="sr-only">Archive</span>
+              <Button variant="ghost" size="icon" onClick={toggleAi}>
+                <PanelRightClose className="h-4 w-4" />
+                <span className="sr-only">PanelLeft</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Archive</TooltipContent>
+            <TooltipContent>PanelLeft</TooltipContent>
           </Tooltip>
+        </div>
 
-          <Separator orientation="vertical" className="mx-1 h-6" />
-
+        {/* Snooze Section */}
+        <div className="ml-auto flex items-center gap-2">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -96,36 +111,11 @@ export const HeadTool: React.FC<HeadToolProps> = ({ setMessages }) => {
                 size="icon"
                 onClick={handleClearData} // 点击时清除缓存和当前信息
               >
-                <Trash2 className="h-4 w-4" />
+                <RefreshCcw className="h-4 w-4" />
                 <span className="sr-only">Move to trash</span>
               </Button>
             </TooltipTrigger>
             <TooltipContent>Move to trash</TooltipContent>
-          </Tooltip>
-        </div>
-
-        {/* Snooze Section */}
-        <div className="ml-auto flex items-center gap-2">
-          <Tooltip>
-            <Popover>
-              <PopoverTrigger asChild>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Clock className="h-4 w-4" />
-                    <span className="sr-only">Snooze</span>
-                  </Button>
-                </TooltipTrigger>
-              </PopoverTrigger>
-              <PopoverContent className="flex w-[535px] p-0">
-                <div className="flex flex-col gap-2 border-r px-2 py-4">
-                  <div className="px-4 text-sm font-medium">Snooze until</div>
-                </div>
-                <div className="p-2">
-                  <Calendar />
-                </div>
-              </PopoverContent>
-            </Popover>
-            <TooltipContent>Snooze</TooltipContent>
           </Tooltip>
         </div>
 

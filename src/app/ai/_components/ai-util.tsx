@@ -17,13 +17,18 @@ export function generateFunctionDeclarations(
 
   return {
     functionDeclarations: actions.map((action: AvailableAction) => {
-      if (!action.schema || !(action.schema instanceof ZodObject)) {
-        throw new Error(
-          `Invalid schema for action "${action.name}". Expected a ZodObject.`
-        );
+      const { schema } = action;
+
+      // 检查 schema 是否为 null 或者非 ZodObject
+      if (!schema || !(schema instanceof ZodObject)) {
+        // schema 为 null 的情况下，不定义 parameters
+        return {
+          name: action.name,
+          description: action.description,
+        };
       }
 
-      const schema = action.schema;
+      // schema 存在并且合法时处理 parameters
       return {
         name: action.name,
         description: action.description,
@@ -84,12 +89,12 @@ function convertZodTypeToSchemaType(zodType: any): SchemaType {
 }
 
 function actionToFunctionAdapter(
-  schema: any,
+  schema: any | null,
   method: (args: any) => Promise<any>
 ): (args: any) => Promise<any> {
   return async (args: any) => {
-    // 1. 验证输入
-    const validatedInput = schema.parse(args);
+    // 1. 验证输入（如果 schema 存在）
+    const validatedInput = schema ? schema.parse(args) : args;
 
     // 2. 执行业务逻辑
     const result = await method(validatedInput);
@@ -120,4 +125,3 @@ export function useFunctionsFromActions(
     return functions;
   }, [actions]);
 }
-

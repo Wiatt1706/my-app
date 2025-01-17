@@ -41,7 +41,7 @@ export function SelectTableSheet({
 
   const { table } = useDataTable({
     data,
-    columns: columns.filter((col) => col.id == "select"),
+    columns: columns.filter((col) => col.id == "title"),
     pageCount,
     enableAdvancedFilter: true,
     initialState: {

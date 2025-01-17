@@ -18,7 +18,7 @@ const ResizablePanelContent: React.FC<{ children: React.ReactNode }> = ({
       <ResizablePanel defaultSize={75}>{children}</ResizablePanel>
       <ResizableHandle withHandle />
       {state.isVisible && (
-        <ResizablePanel defaultSize={25} maxSize={50}>
+        <ResizablePanel defaultSize={25} maxSize={50} className="min-w-[300px]">
           <TableAi />
         </ResizablePanel>
       )}

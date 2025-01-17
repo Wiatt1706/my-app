@@ -46,25 +46,25 @@ export const useAiHandler = ({
   const functions = useFunctionsFromActions(allActions); // Always call
   const tools = generateFunctionDeclarations(allActions); // Always call
 
-    const baseInstructions = initialConfig.baseInstructions
+  const baseInstructions = initialConfig.baseInstructions
     ? `下面这些是我的基础说明，请你在回答时牢记：${initialConfig.baseInstructions}`
     : "";
 
-    const systemInstruction = `
+  const systemInstruction = `
     现在你是DeepCosmo平台的智能 AI 系统，你的主要任务是根据当前页面的调用函数和数据来自动化执行任务，你回答用户的需求时请更多的自主去进行推断，而减少对用户的要求，即使你无法理解用户的需求你也需要推断用户的需求，结合目前你所有的知识进行回答。
     请始终使用中文沟通，并切记你是 DeepCosmo 平台的智能 AI 助手。
     ${baseInstructions}
     `;
 
-    const modelConfig: any = {
+  const modelConfig: any = {
     model: "gemini-2.0-flash-exp",
     systemInstruction: `
         ${systemInstruction}
         同时，你将获得当前页面的基本数据：${JSON.stringify(state.pageInfo)}
+        当前页面的选择的数据：${JSON.stringify(state.selectedRow)}
     `,
     tools,
-    };
-
+  };
 
   const model = genAI.getGenerativeModel(modelConfig);
 
@@ -74,7 +74,7 @@ export const useAiHandler = ({
 
   const handleSend = async (text: string) => {
     console.log("modelConfig", modelConfig);
-    
+
     if (!text.trim() || isLoading) return;
 
     const userMessage: AiMessage = { role: "user", parts: [{ text }] };

@@ -48,8 +48,8 @@ export function getColumns({
 }: GetColumnsProps): ColumnDef<SystemMenu>[] {
   return [
     {
-      id: "select",
-      accessorKey: "select",
+      id: "title",
+      accessorKey: "title",
       header: ({ column, table }) => (
         <div className="flex items-center gap-2">
           {multiple && (

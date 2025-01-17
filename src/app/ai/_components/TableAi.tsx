@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, useRef } from "react";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -8,21 +6,31 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { AiMessage } from "../_lib/chatApi";
 import { HeadTool } from "./HeadTool";
 import { MessageList } from "./message/MessageList";
 import { CommentEditorWrapper } from "./CommentEditorWrapper";
+import { useAiHandler } from "./AiHandler";
+import { useAiboard } from "@/hooks/useAiboard";
 
 export function TableAi() {
+  const { state } = useAiboard();
   const [messages, setMessages] = useState<AiMessage[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setLoading] = useState(false);
   const [scrollAreaHeight, setScrollAreaHeight] = useState("100%");
 
   const headToolRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const { handleSend } = useAiHandler({
+    messages,
+    setMessages,
+    setLoading,
+    isLoading,
+    state,
+  });
 
   const templates = [
     {
@@ -108,45 +116,39 @@ export function TableAi() {
             <div ref={messagesEndRef} />
           </>
         ) : (
-          <div className="flex flex-col items-center justify-center h-full p-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {templates.map((template, index) => (
-                <Card
-                  key={index}
-                  className="w-full cursor-pointer"
-                  onClick={() => {
-                    setMessages((prevMessages) => [
-                      ...prevMessages,
-                      {
-                        role: "user",
-                        parts: [
-                          {
-                            text: template.content,
-                            manualFunctionCalls: [],
-                            autoFunctionCalls: [],
-                          },
-                        ]
-                      },
-                    ]);
-                  }}
-                >
-                  <CardHeader>
-                    <CardTitle>{template.title}</CardTitle>
-                    <CardDescription>{template.description}</CardDescription>
-                  </CardHeader>
-                </Card>
-              ))}
-            </div>
+          <div className="flex flex-wrap gap-4 justify-start w-full p-4">
+            {templates.map((template, index) => (
+              <Card
+                key={index}
+                className="w-full cursor-pointer"
+                onClick={() => {
+                  setMessages((prevMessages) => [
+                    ...prevMessages,
+                    {
+                      role: "user",
+                      parts: [
+                        {
+                          text: template.content,
+                          manualFunctionCalls: [],
+                          autoFunctionCalls: [],
+                        },
+                      ],
+                    },
+                  ]);
+                }}
+              >
+                <CardHeader>
+                  <CardTitle>{template.title}</CardTitle>
+                  <CardDescription>{template.description}</CardDescription>
+                </CardHeader>
+              </Card>
+            ))}
           </div>
         )}
       </div>
       <div ref={bottomRef} className="absolute bottom-0 w-full bg-background">
         <Separator className="mt-auto" />
-        <CommentEditorWrapper
-          messages={messages}
-          setMessages={setMessages}
-          setIsLoading={setIsLoading}
-        />
+        <CommentEditorWrapper isLoading={isLoading} handleSend={handleSend} />
       </div>
     </div>
   );

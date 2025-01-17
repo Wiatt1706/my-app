@@ -19,8 +19,15 @@ import { getExpandedRowModel } from "@tanstack/react-table";
 import { CreateSheet } from "./create-systemMenu-sheet";
 import { getMenuTypeContent } from "../_lib/utils";
 import { useAiboard } from "@/hooks/useAiboard";
-import { createSchema, selectSchema } from "../_lib/validations";
-import { createSystemMenu, getMenusWithChildrenByAi } from "../_lib/actions";
+import { createSchema, selectSchema, updateSchema } from "../_lib/validations";
+import {
+  createSystemMenu,
+  deleteSystemMenus,
+  getMenusWithChildrenByAi,
+  updateSystemMenu,
+} from "../_lib/actions";
+import { z } from "zod";
+import { exportTableToCSV } from "@/lib/export";
 
 export const MenuTableFilterFields: DataTableAdvancedFilterField<SystemMenu>[] =
   [
@@ -109,17 +116,42 @@ export function MenuTable({ promises }: TableProps) {
 
     const actions = [
       {
-        name: "createMenu",
-        description: "创建菜单,注意必填参数，如果没有则你随机生成，必须保证必填参数有值",
-        schema: createSchema,
-        method: createSystemMenu,
-      },
-      {
         name: "selectMenu",
         description: "查询菜单",
         schema: selectSchema,
         method: getMenusWithChildrenByAi,
         autoExecute: true,
+      },
+      {
+        name: "updateMenu",
+        description: "更新菜单",
+        schema: updateSchema,
+        method: updateSystemMenu,
+      },
+      {
+        name: "createMenu",
+        description:
+          "创建菜单,注意必填参数，如果没有则你随机生成，必须保证必填参数有值",
+        schema: createSchema,
+        method: createSystemMenu,
+      },
+      {
+        name: "deleteMenu",
+        description: "删除菜单, 注意需要传入 ids 是一个字符串数组",
+        schema: z.object({
+          ids: z.string().array(), 
+        }),
+        method: deleteSystemMenus,
+      },
+      {
+        name: "exportMenu",
+        description: "导出菜单",
+        schema: null,
+        method: () =>
+          exportTableToCSV(table, {
+            filename: "systemMenus",
+            excludeColumns: ["select", "actions"],
+          }),
       },
     ];
 
@@ -129,6 +161,13 @@ export function MenuTable({ promises }: TableProps) {
       payload: { availableActions: actions },
     });
   }, [dispatch]);
+
+  React.useEffect(() => {
+    dispatch({
+      type: "SET_SELECTED_ROW",
+      payload: table.getFilteredSelectedRowModel().flatRows,
+    });
+  }, [table.getFilteredSelectedRowModel().flatRows, dispatch]);
 
   return (
     <>
