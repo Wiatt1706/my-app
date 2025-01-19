@@ -99,8 +99,8 @@ export function ShortcutField({ value, onChange }: ShortcutFieldProps) {
 
           {/* 监听状态 */}
           {isListening && (
-            <div className="p-4 border rounded-md bg-gray-100">
-              <p className="text-sm text-gray-500">
+            <div className="p-4 border rounded-md bg-muted">
+              <p className="text-sm text-muted-500">
                 当前设置: {currentShortcut.join(" + ") || "按下数字或英文字母"}
               </p>
               <div className="mt-2 flex gap-2">
