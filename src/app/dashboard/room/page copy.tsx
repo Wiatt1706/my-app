@@ -1,55 +1,68 @@
 "use client";
-import styles from "@/styles/world/index.module.css";
 import { Canvas } from "@react-three/fiber";
 import {
-  Cloud,
-  Clouds,
+  useGLTF,
+  PresentationControls,
+  Environment,
+  ContactShadows,
   Html,
-  Sky,
-  useProgress,
 } from "@react-three/drei";
-import { Suspense, useEffect } from "react";
-import { Physics } from "@react-three/rapier";
-import * as THREE from "three";
-import Lights from "./_components/Lights";
-import { useStateContext } from "./_components/StateContext";
-import Player from "./_components/Player";
-import Ground from "./_components/Ground";
-export default function PlayWorld({ info }) {
-  const { systemInfo, setModelList } = useStateContext();
 
-  useEffect(() => {
-    setModelList(info.models);
-  }, [info.models]);
-
-
+export default function App() {
   return (
-    <div className={styles["editor"]}>
-      <Canvas
-        shadows
-        camera={{ position: [0, 3, 2], far: 50, fov: 75, near: 0.1 }}
+    <Canvas shadows camera={{ position: [0, 0, 10], fov: 25 }}>
+      <ambientLight intensity={0.5} />
+      <spotLight
+        position={[10, 10, 10]}
+        angle={0.15}
+        penumbra={1}
+        shadow-mapSize={2048}
+        castShadow
+      />
+      <PresentationControls
+        global
+        config={{ mass: 2, tension: 500 }}
+        snap={{ mass: 4, tension: 1500 }}
+        rotation={[0, 0.3, 0]}
+        polar={[-Math.PI / 3, Math.PI / 3]}
+        azimuth={[-Math.PI / 1.4, Math.PI / 2]}
       >
-        <Lights />
-        <color attach="background" args={[systemInfo.sceneColor]} />
-        <fog attach="fog" args={["#fff", 10, 60]} />
-        {/* <Environment preset={systemInfo.sceneEvn} background blur={0.78} /> */}
-        {info?.system_data?.openSky && <Sky sunPosition={[100, 100, 100]} />}
-        <Suspense fallback={<Loader />}>
-          <Physics colliders={false}>
-            <Ground />
-            <Player />
-          </Physics>
-
-          <Clouds material={THREE.MeshBasicMaterial}>
-            <Cloud seed={10} bounds={20} volume={30} position={[0, 40, 0]} />
-          </Clouds>
-        </Suspense>
-      </Canvas>
-    </div>
+        <Watch
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[0, 0.25, 0]}
+          scale={0.003}
+        />
+      </PresentationControls>
+      <ContactShadows
+        position={[0, -1.4, 0]}
+        opacity={0.75}
+        scale={10}
+        blur={3}
+        far={4}
+      />
+      <Environment preset="city" />
+    </Canvas>
   );
 }
 
-function Loader() {
-  const { progress } = useProgress();
-  return <Html center>{progress} % loaded</Html>;
+function Watch(props) {
+  // const { nodes, materials } = useGLTF("/watch-v1.glb");
+  return (
+    <group {...props} dispose={null}>
+      <Html
+        scale={100}
+        rotation={[Math.PI / 2, 0, 0]}
+        position={[180, -350, 50]}
+        transform
+        occlude
+      >
+        <iframe
+          title="embed"
+          width={700}
+          height={500}
+          src="https://threejs.org/"
+        />
+      </Html>
+    </group>
+  );
 }

@@ -18,7 +18,7 @@ const Lights = () => {
   const [lightIntensity, setLightIntensity] = useState<number>(1);
   const [lightColor, setLightColor] = useState<string>("#ffd700");
   const [lightPosition, setLightPosition] = useState<LightPosition>([
-    0, 10, 10,
+    0, 100, 100,
   ]);
 
   // 控制灯光是否开启

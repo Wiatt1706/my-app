@@ -12,8 +12,6 @@ export default async function DashboardLayout({
 }) {
 
 	return (
-
 		<div className="w-full h-full bg-[#151520]">{children}</div>
-
 	);
 }

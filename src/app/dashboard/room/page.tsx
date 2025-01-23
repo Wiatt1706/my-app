@@ -6,6 +6,8 @@ import { StateProvider } from "./_components/StateContext";
 import Player from "./_components/Player";
 import Ground from "./_components/Ground";
 import { Level, Sudo, Camera, Cactus, Box } from "./_components/Scene";
+import { HtmlModel } from "./_components/HtmlDemo";
+import { Environment } from "@react-three/drei";
 export default function PlayWorld() {
 
   return (
@@ -13,6 +15,7 @@ export default function PlayWorld() {
       <Canvas
         className="bg-background"
         shadows
+        linear
         camera={{ position: [0, 3, 2], far: 50, fov: 75, near: 0.1 }}
       >
         <Lights />
@@ -27,6 +30,13 @@ export default function PlayWorld() {
           <Ground />
           <Player />
         </Physics>
+        <group rotation={[0, Math.PI, 0]} position={[1, 2, 1]}>
+          <HtmlModel />
+        </group>
+        <gridHelper
+          args={[1000, 200, "#151515", "#020202"]}
+          position={[0, 0, 0]}
+        />
       </Canvas>
     </StateProvider>
   );
